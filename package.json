@@ -1,0 +1,22 @@
+{
+  "name": "flat-hisaab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Split daily food costs between flatmates",
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "node src/test.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/share": "8.0.3",
+    "@supabase/supabase-js": "2.119.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  }
+}

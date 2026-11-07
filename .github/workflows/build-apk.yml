@@ -1,0 +1,83 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Test the money logic
+        run: node src/test.js
+
+      - name: Build the app files
+        run: python3 build.py
+
+      - name: Copy into the Android project
+        run: npx cap sync android
+
+      - name: Load the signing key from repository secrets
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Add the KEYSTORE_BASE64 and KEYSTORE_PASSWORD secrets (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.jks
+          printf "storeFile=release.jks\nstorePassword=%s\nkeyAlias=flathisaab\nkeyPassword=%s\n" "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" > android/app/keystore.properties
+
+      - name: Build signed APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/app-release.apk out/FlatHisaab.apk
+          ls -la out
+
+      - name: Keep APK as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlatHisaab-apk
+          path: out/FlatHisaab.apk
+
+      - name: Publish APK to the "apk" branch
+        run: |
+          cd out
+          git init -q
+          git checkout -q -b apk
+          git add FlatHisaab.apk
+          git -c user.name="build bot" -c user.email="build-bot@users.noreply.github.com" commit -q -m "APK from ${GITHUB_SHA::7} (run ${GITHUB_RUN_NUMBER})"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" apk
+
+      - name: Publish a release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Flat Hisaab 1.0.${{ github.run_number }}
+          files: out/FlatHisaab.apk
