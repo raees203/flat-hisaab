@@ -2,8 +2,14 @@
   "appId": "pk.flathisaab.app",
   "appName": "Flat Hisaab",
   "webDir": "www",
-  "android": { "allowMixedContent": false },
+  "android": {
+    "allowMixedContent": false
+  },
   "plugins": {
-    "LocalNotifications": { "smallIcon": "ic_stat_hisaab", "iconColor": "#3A44C9" }
-  }
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_hisaab",
+      "iconColor": "#1E6B58"
+    }
+  },
+  "backgroundColor": "#f5f5f2"
 }

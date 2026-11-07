@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Flat Hisaab</title>
-<meta name="theme-color" content="#3a44c9">
+<meta name="theme-color" content="#f5f5f2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -12,34 +12,31 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 /*__STYLE__*/
 </head>
 <body>
-<div class="wrap">
-  <header class="top" id="topbar">
-    <h1 id="flatName">Flat Hisaab<span class="sub" id="meLine"></span></h1>
-    <button class="iconbtn" data-act="open-approvals" aria-label="Payments to approve" id="bell">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+<div class="app">
+  <header class="top" id="topbar" hidden>
+    <div class="title"><h1 id="flatName">Flat Hisaab</h1><div class="sub" id="meLine"></div></div>
+    <button class="icon-btn" data-act="open-approvals" aria-label="Payments to approve" id="bell">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
       <span class="badge" id="bellBadge" hidden></span>
     </button>
-    <button class="iconbtn" data-act="open-settings" aria-label="Settings and members" id="gear">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    <button class="icon-btn" data-act="open-settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
     </button>
   </header>
   <div id="banner"></div>
   <main id="main"><div class="loading">Starting…</div></main>
 </div>
 
-<nav class="tabs" aria-label="Sections" id="tabs">
+<nav class="tabs" aria-label="Sections" id="tabs" hidden>
   <div class="in">
-    <button class="tab" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h12a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2z"/><path d="M7 8h7M7 12h7M7 16h4"/></svg>Balances<span class="dot" id="tabDot" hidden></span></button>
-    <button class="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="7"/><path d="M5 13h14M12 3v3"/></svg>Today</button>
-    <button class="fab" data-act="add-expense" aria-label="Add an expense"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button class="tab" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>History</button>
-    <button class="tab" data-tab="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Report</button>
+    <button class="tab" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home<span class="dot" id="tabDot" hidden></span></button>
+    <button class="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Today</button>
+    <button class="fab" data-act="add-expense" aria-label="Add an expense"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tab" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>History</button>
+    <button class="tab" data-tab="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Report</button>
   </div>
 </nav>
 <div id="sheetRoot"></div>
@@ -58,12 +55,13 @@
 var MEALS = [{ k: "nashta", label: "Breakfast" }, { k: "lunch", label: "Lunch" }, { k: "dinner", label: "Dinner" }];
 var MEAL_LABEL = { nashta: "Breakfast", lunch: "Lunch", dinner: "Dinner", other: "Other" };
 var METHODS = ["Cash", "JazzCash", "Easypaisa", "Bank"];
-var TABS = ["home", "today", "history", "report"];
 var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 var MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var CFG = window.HISAAB_CONFIG || {};
 var Cap = (window.Capacitor && window.Capacitor.Plugins) || {};
+var CHEV = '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>';
+var MARK = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M6 3h12v16.5l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3z"/><path d="M9 8h6M9 11.5h6M9 15h3.5" stroke="#1e6b58" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
 function pad(n) { return (n < 10 ? "0" : "") + n; }
 function dstr(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
@@ -74,6 +72,7 @@ function fmtDate(s) { var d = parseD(s); return DAYS[d.getDay()] + ", " + d.getD
 function fmtMonth(m) { var p = m.split("-"); return MONTHS_FULL[+p[1] - 1] + " " + p[0]; }
 function shiftMonth(m, n) { var p = m.split("-"); var d = new Date(+p[0], +p[1] - 1 + n, 1); return d.getFullYear() + "-" + pad(d.getMonth() + 1); }
 function rs(n) { return "Rs " + Math.abs(Math.round(n)).toLocaleString("en-US"); }
+function signed(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + rs(n); }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 function initials(n) { n = (n || "?").trim(); return esc(n.charAt(0).toUpperCase() || "?"); }
 function people(n) { return n + (n === 1 ? " person" : " people"); }
@@ -84,14 +83,15 @@ function uuid() {
   if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); });
 }
+function itemTitle(e) { return e.note || MEAL_LABEL[e.meal] || "Expense"; }
 
 // ---------- state ----------
 var SB = null;
 var S = {
-  view: "boot", uid: null, offline: !navigator.onLine, bootError: "",
+  view: "boot", uid: null, offline: !navigator.onLine, bootError: "", loadError: "",
   flatId: lsGet("hisaab.flat"), flat: null, myFlats: [],
   members: [], expenses: [], payments: [], att: {}, attDate: today(), loaded: false,
-  tab: "home", month: today().slice(0, 7), hf: "all", hm: "", sheet: null, onboard: null
+  tab: "home", month: today().slice(0, 7), hf: "all", hm: "", sheet: null, ob: null
 };
 var channel = null;
 var seenPending = {};
@@ -102,7 +102,6 @@ function memberIds() { return S.members.map(function (m) { return m.id; }); }
 function member(id) { for (var i = 0; i < S.members.length; i++) if (S.members[i].id === id) return S.members[i]; return null; }
 function nameOf(id) { var m = member(id); return m ? (m.name || "Member") : "Former member"; }
 function myId() { for (var i = 0; i < S.members.length; i++) if (S.members[i].uid && S.members[i].uid === S.uid) return S.members[i].id; return null; }
-function meValid() { return !!myId(); }
 function isOwner() { return !!(S.flat && S.uid && S.flat.owner_id === S.uid); }
 function takenByOther(m) { return !!(m && m.uid && m.uid !== S.uid); }
 function sortEntries(a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : (b.createdAt || 0) - (a.createdAt || 0); }
@@ -111,17 +110,25 @@ function pairs() { return pairwiseDebts(S.expenses, S.payments); }
 function eating(att, date, meal, mid) { var d = att[date + "_" + mid]; return d ? d[meal] !== false : true; }
 function findById(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
 function flatName() { return (S.flat && S.flat.name) || "Flat"; }
-// iPhone Safari keeps a Home Screen app's storage separate from Safari's, so set up from the icon.
 function needsHomeScreen() {
   var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var standalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
   return ios && !standalone && !window.Capacitor;
 }
 
-function canApprove(p) { return !!p && p.status === "pending" && meValid() && p.to === myId(); }
+// Who may do what (the database enforces the same rules)
+function canApprove(p) { return !!p && p.status === "pending" && !!myId() && p.to === myId(); }
 function myApprovals() { return S.payments.filter(canApprove).sort(sortEntries); }
-function canDeleteExpense(e) { return isOwner() || e.createdByUid === S.uid || (meValid() && e.paidBy === myId()); }
-function canDeletePayment(p) { return isOwner() || (p.status !== "approved" && (p.createdByUid === S.uid || (meValid() && p.from === myId()))); }
+function payerChoices() {
+  var me = myId(), list = [];
+  if (me) list.push(member(me));
+  if (isOwner()) active().forEach(function (m) { if (!m.uid && m.id !== me) list.push(m); });
+  return list;
+}
+function canMarkAttendance(mid) { return mid === myId() || isOwner(); }
+function canDeleteExpense(e) { return e.createdByUid === S.uid; }
+function canDeletePayment(p) { return p.createdByUid === S.uid && p.status !== "approved"; }
+function canEditMember(m) { return isOwner() || (m && m.uid === S.uid); }
 
 // ---------- toast ----------
 var toastT = null;
@@ -132,7 +139,7 @@ function toast(msg) {
 function errText(e) {
   var m = (e && (e.message || e.error_description || e.msg)) || "";
   if (!navigator.onLine || /fetch|network|Failed to|timeout/i.test(m)) return "Couldn't reach the server. Check your internet and try again.";
-  if (/row-level security/i.test(m)) return "You're not allowed to do that in this flat.";
+  if (/row-level security/i.test(m)) return "You can only change your own entries.";
   return m || "Something went wrong. Try again.";
 }
 function fail(e) { toast(errText(e)); }
@@ -162,9 +169,7 @@ function fetchAll(table, order) {
   return page(0);
 }
 var loaders = {
-  flat: function () {
-    return SB.from("flats").select("*").eq("id", S.flatId).maybeSingle().then(function (r) { if (r.error) throw r.error; S.flat = r.data; });
-  },
+  flat: function () { return SB.from("flats").select("*").eq("id", S.flatId).maybeSingle().then(function (r) { if (r.error) throw r.error; S.flat = r.data; }); },
   members: function () { return fetchAll("members", "created_at").then(function (rows) { S.members = rows.map(mapMember); }); },
   expenses: function () { return fetchAll("expenses", "created_at").then(function (rows) { S.expenses = rows.map(mapExpense).sort(sortEntries); }); },
   payments: function () { return fetchAll("payments", "created_at").then(function (rows) { S.payments = rows.map(mapPayment).sort(sortEntries); notifyNewPending(); }); },
@@ -177,30 +182,28 @@ var loaders = {
     });
   }
 };
-var pending = {}, timers = {};
+var busy = {}, timers = {};
 function refresh(table) {
   clearTimeout(timers[table]);
   timers[table] = setTimeout(function () {
-    if (!S.flatId || pending[table]) return;
-    pending[table] = true;
+    if (!S.flatId || busy[table]) return;
+    busy[table] = true;
     loaders[table]().then(function () {
-      pending[table] = false;
+      busy[table] = false;
       if (table === "flat" && !S.flat) { leaveToOnboarding("You're no longer part of that flat."); return; }
       renderAll();
-      if (S.sheet && S.sheet.type !== "expense" && S.sheet.type !== "payment" && S.sheet.type !== "copy") renderSheet();
-    }).catch(function (e) { pending[table] = false; if (!navigator.onLine) { S.offline = true; renderBanner(); } else console.warn(table, e); });
+      if (S.sheet && ["expense", "payment", "copy", "image"].indexOf(S.sheet.type) < 0) renderSheet();
+    }).catch(function () { busy[table] = false; if (!navigator.onLine) { S.offline = true; renderBanner(); } });
   }, 250);
 }
 function loadEverything() {
-  S.loaded = false; renderAll();
+  S.loaded = false; S.loadError = ""; renderAll();
   return loaders.flat().then(function () {
     if (!S.flat) { leaveToOnboarding("That flat isn't available any more. Join again with its code."); return; }
     return Promise.all([loaders.members(), loaders.expenses(), loaders.payments(), loaders.attendance()]).then(function () {
       S.loaded = true; S.offline = false; renderAll();
     });
-  }).catch(function (e) {
-    S.offline = !navigator.onLine; S.loadError = errText(e); renderAll();
-  });
+  }).catch(function (e) { S.offline = !navigator.onLine; S.loadError = errText(e); renderAll(); });
 }
 function subscribe() {
   if (channel) { SB.removeChannel(channel); channel = null; }
@@ -223,7 +226,7 @@ function openFlat(id) {
 }
 function leaveToOnboarding(msg) {
   if (channel) { SB.removeChannel(channel); channel = null; }
-  S.flatId = null; lsSet("hisaab.flat", null); S.flat = null; S.view = "onboard"; closeSheet();
+  S.flatId = null; lsSet("hisaab.flat", null); S.flat = null; S.view = "onboard"; S.ob = null; closeSheet();
   loadMyFlats(); renderAll();
   if (msg) toast(msg);
 }
@@ -303,19 +306,24 @@ function duesText() {
   else { lines.push("Who owes whom:"); t.forEach(function (x) { lines.push("• " + nameOf(x.from) + " → " + nameOf(x.to) + ": " + rs(x.amount)); }); }
   return lines.join("\n");
 }
-function remindText(from, amount) {
-  return "Hi " + nameOf(from) + ", as per Flat Hisaab you owe me " + rs(amount) + " for " + flatName() + " expenses. Please pay when you can.";
+function remindText(other) {
+  var me = myId(), b = pairBreakdown(me, other, S.expenses, S.payments);
+  var lines = ["Hi " + nameOf(other) + ", as per Flat Hisaab you owe me " + rs(b.total) + ":"];
+  b.items.filter(function (i) { return i.amount; }).slice(-8).forEach(function (i) {
+    lines.push("• " + fmtDate(i.date) + " · " + (i.kind === "payment" ? "payment" : itemTitle(i)) + ": " + signed(i.amount));
+  });
+  return lines.join("\n");
 }
 function inviteText() {
   return "Join *" + flatName() + "* on Flat Hisaab to split our food costs.\n\n" +
-    (CFG.webUrl ? "iPhone: open " + CFG.webUrl + " in Safari → Share → Add to Home Screen.\nAndroid: install the APK I send you.\n\n" : "") +
-    "Then tap Join flat and enter code: *" + (S.flat ? S.flat.code : "") + "*";
+    (CFG.webUrl ? "iPhone: open " + CFG.webUrl + " in Safari → Share → Add to Home Screen.\nAndroid: install the app I send you.\n\n" : "") +
+    "Then tap “Join a flat” and enter the code: *" + (S.flat ? S.flat.code : "") + "*";
 }
 function reportText(m) {
   var R = monthData(m), t = pairs();
-  var lines = ["*" + flatName() + " report: " + fmtMonth(m) + "*", "", "Total spent: " + rs(R.total), "Meals: " + R.meals, "", "Paid vs share this month:"];
+  var lines = ["*" + flatName() + " · " + fmtMonth(m) + "*", "", "Total spent: " + rs(R.total), "Meals: " + R.meals, "", "Paid vs share:"];
   R.rows.forEach(function (r) { lines.push("• " + r.name + ": paid " + rs(r.paid) + ", share " + rs(r.share)); });
-  lines.push("", t.length ? "Who owes whom (all time):" : "Everyone is settled up.");
+  lines.push("", t.length ? "Who owes whom:" : "Everyone is settled up.");
   t.forEach(function (x) { lines.push("• " + nameOf(x.from) + " → " + nameOf(x.to) + ": " + rs(x.amount)); });
   return lines.join("\n");
 }
@@ -340,35 +348,35 @@ function monthData(m) {
 // ---------- rendering ----------
 function balPill(v) {
   v = Math.round(v);
-  if (v > 0) return '<span class="pill good num">Gets ' + rs(v) + "</span>";
-  if (v < 0) return '<span class="pill bad num">Owes ' + rs(v) + "</span>";
-  return '<span class="pill even">Settled</span>';
+  if (v > 0) return '<span class="pill good num">gets ' + rs(v) + "</span>";
+  if (v < 0) return '<span class="pill bad num">owes ' + rs(v) + "</span>";
+  return '<span class="pill even">settled</span>';
 }
 function statusPill(p) {
-  if (p.status === "pending") return ' <span class="pill pending">Pending</span>';
-  if (p.status === "rejected") return ' <span class="pill rejected">Rejected</span>';
+  if (p.status === "pending") return ' <span class="pill wait">Pending</span>';
+  if (p.status === "rejected") return ' <span class="pill off">Rejected</span>';
   return "";
 }
 function renderHeader() {
   var inApp = S.view === "app" && S.loaded;
-  $("topbar").style.display = S.view === "app" ? "" : "none";
-  $("tabs").style.display = inApp ? "" : "none";
-  $("flatName").firstChild.nodeValue = S.flat ? S.flat.name : "Flat Hisaab";
-  $("meLine").textContent = meValid() ? "You: " + nameOf(myId()) : "";
+  $("topbar").hidden = S.view !== "app";
+  $("tabs").hidden = !inApp;
+  $("flatName").textContent = S.flat ? S.flat.name : "Flat Hisaab";
+  var me = myId();
+  $("meLine").textContent = me ? "You're " + nameOf(me) : (inApp ? "Pick your name below" : "");
   var n = inApp ? myApprovals().length : 0;
   $("bellBadge").hidden = !n; $("bellBadge").textContent = n; $("tabDot").hidden = !n;
-  $("bell").style.display = inApp ? "" : "none";
+  $("bell").hidden = !inApp;
 }
 function renderBanner() {
   var b = "";
   if (S.offline) b = '<div class="banner warn">You\'re offline. Showing the last data; changes need internet.</div>';
-  else if (S.view === "app" && S.loaded && S.members.length && !meValid()) {
-    b = '<div class="banner"><div style="font-weight:700;margin-bottom:8px">Which one are you? Tap your name once; it links to this phone.</div><div class="chips">' +
+  else if (S.view === "app" && S.loaded && S.members.length && !myId()) {
+    b = '<div class="banner"><b>Which one are you?</b><div class="small muted" style="margin-top:2px">Tap your name once. It links to this phone.</div><div class="chips">' +
       active().map(function (m) {
         var taken = takenByOther(m);
-        return '<button class="chip plain" aria-pressed="false" data-act="set-me" data-id="' + esc(m.id) + '"' + (taken ? " disabled" : "") + ">" + esc(m.name) + (taken ? " (linked)" : "") + "</button>";
-      }).join("") + '</div><div style="margin-top:12px;font-weight:600;font-size:.88rem">Not in the list? Add yourself:</div>' +
-      '<div class="row" style="border:0;padding:6px 0 0"><input class="input" id="self-name" maxlength="30" placeholder="Your name" aria-label="Your name"><button class="btn sm primary" data-act="add-self">Add me</button></div></div>';
+        return '<button class="chip" data-act="set-me" data-id="' + esc(m.id) + '"' + (taken ? " disabled" : "") + ">" + esc(m.name) + (taken ? " · linked" : "") + "</button>";
+      }).join("") + '</div><div class="row" style="border:0;padding:12px 0 0"><input class="input" id="self-name" maxlength="30" placeholder="Not in the list? Your name" aria-label="Your name" style="flex:1 1 10rem"><button class="btn" data-act="add-self">Add me</button></div></div>';
   }
   $("banner").innerHTML = b;
 }
@@ -380,156 +388,171 @@ function renderNav() {
   }
 }
 
+// --- start screens ---
 function renderBoot() {
-  if (S.bootError) return '<div class="hero"><h1>Flat Hisaab</h1><p>' + esc(S.bootError) + '</p></div><button class="btn primary block" data-act="retry-boot">Try again</button>';
-  return '<div class="hero"><h1>Flat Hisaab</h1><p>Connecting…</p></div>';
+  if (S.bootError) return '<div class="welcome"><div class="mark">' + MARK + '</div><h1>Flat Hisaab</h1><p>' + esc(S.bootError) + '</p></div><button class="btn primary block" data-act="retry-boot">Try again</button>';
+  return '<div class="loading">Connecting…</div>';
 }
 function renderOnboard() {
-  var o = S.onboard || (S.onboard = { mode: "", name: "", members: ["", "", "", ""], me: 0, code: "" });
-  var h = '<div class="hero"><h1>Flat Hisaab</h1><p>Split your flat\'s food costs. Everyone sees who paid and who owes, live.</p></div><div class="stack">';
-  if (needsHomeScreen()) {
-    h += '<div class="banner"><div style="font-weight:700;margin-bottom:4px">On iPhone: add this to your Home Screen first</div>' +
-      'Tap the <b>Share</b> button in Safari (square with an arrow), then <b>Add to Home Screen</b>. Open Flat Hisaab from that icon and join your flat there, so it stays signed in like an app.</div>';
+  var o = S.ob || (S.ob = { step: "choose", code: "", name: "", you: "", members: ["", ""] });
+  if (o.step === "join") {
+    return '<button class="back" data-act="ob-step" data-v="choose">‹ Back</button><div class="stack" style="padding-top:12px">' +
+      '<div><h1>Join a flat</h1><p class="muted" style="margin-top:6px">Enter the 6-letter code your flatmate shared.</p></div>' +
+      '<input class="input code" id="ob-code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123" value="' + esc(o.code) + '" aria-label="Flat code">' +
+      '<div class="err" id="ob-err"></div><button class="btn primary block" data-act="ob-join">Join flat</button></div>';
   }
+  if (o.step === "create") {
+    return '<button class="back" data-act="ob-step" data-v="choose">‹ Back</button><div class="stack" style="padding-top:12px">' +
+      '<div><h1>Create a flat</h1><p class="muted" style="margin-top:6px">Others can also add themselves when they join with the code.</p></div>' +
+      '<div class="field"><label for="ob-name">Flat name</label><input class="input" id="ob-name" maxlength="40" placeholder="Markhor Flat" value="' + esc(o.name) + '"></div>' +
+      '<div class="field"><label for="ob-you">Your name</label><input class="input" id="ob-you" maxlength="30" placeholder="Raees" value="' + esc(o.you) + '"></div>' +
+      '<div class="field"><span class="lab">Flatmates</span><div class="stack tight">' +
+      o.members.map(function (n, i) { return '<input class="input" id="ob-m' + i + '" maxlength="30" placeholder="Flatmate ' + (i + 1) + '" value="' + esc(n) + '" data-ob="' + i + '" aria-label="Flatmate ' + (i + 1) + '">'; }).join("") +
+      '</div><button class="link" data-act="ob-more" style="align-self:flex-start">+ Add another</button></div>' +
+      '<div class="err" id="ob-err"></div><button class="btn primary block" data-act="ob-create">Create flat</button></div>';
+  }
+  var h = '<div class="welcome"><div class="mark">' + MARK + '</div><h1>Flat Hisaab</h1><p>Split food costs with your flatmates. See who paid and who owes, live.</p></div><div class="stack" style="padding-top:20px">';
+  if (needsHomeScreen()) h += '<div class="note warn"><b>iPhone:</b> first tap Share → <b>Add to Home Screen</b>, then open Flat Hisaab from that icon.</div>';
   if (S.myFlats.length) {
-    h += '<div class="card"><div class="card-h"><h2>Your flats</h2></div><div class="rows">' + S.myFlats.map(function (f) {
-      return '<button class="row" data-act="open-flat" data-id="' + esc(f.id) + '"><span class="avatar">' + initials(f.name) + '</span><span class="main"><span class="t">' + esc(f.name) + '</span><span class="s">Code ' + esc(f.code) + "</span></span><span class=\"muted\">›</span></button>";
+    h += '<div class="card flush"><div class="list">' + S.myFlats.map(function (f) {
+      return '<button class="row" data-act="open-flat" data-id="' + esc(f.id) + '"><span class="avatar">' + initials(f.name) + '</span><span class="main"><span class="t">' + esc(f.name) + '</span><div class="s">Continue</div></span>' + CHEV + "</button>";
     }).join("") + "</div></div>";
   }
-  h += '<div class="card stack" style="gap:10px"><h2>Join your flat</h2><p class="muted small" style="margin:0">Ask whoever set up the flat for its 6-letter code.</p>' +
-    '<input class="input code-in" id="ob-code" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="ABC123" value="' + esc(o.code) + '" aria-label="Flat code">' +
-    '<div class="err" id="ob-code-err"></div><button class="btn primary block" data-act="ob-join">Join flat</button></div>';
-  h += '<div class="or">or</div>';
-  if (o.mode !== "create") {
-    h += '<button class="btn block" data-act="ob-create-open">Set up a new flat</button>';
-  } else {
-    h += '<div class="card stack"><div><h2>Set up a new flat</h2><p class="muted small" style="margin:4px 0 0">Add everyone who shares food, including you. Others can also add themselves when they join.</p></div>' +
-      '<div class="field"><label for="su-name">Flat name</label><input class="input" id="su-name" maxlength="40" placeholder="Markhor Flat" value="' + esc(o.name) + '"></div>' +
-      '<div class="field"><span class="lab">Members</span><div class="stack" style="gap:8px">' +
-      o.members.map(function (n, i) { return '<input class="input" id="su-m' + i + '" maxlength="30" placeholder="Name ' + (i + 1) + '" value="' + esc(n) + '" data-su="' + i + '" aria-label="Member ' + (i + 1) + '">'; }).join("") +
-      '</div><button class="btn sm" data-act="su-more" style="align-self:flex-start">+ Add another</button></div>' +
-      '<div class="field"><label for="su-me">Which one are you?</label><select class="input" id="su-me">' +
-      o.members.map(function (n, i) { return '<option value="' + i + '"' + (i === o.me ? " selected" : "") + ">" + esc(n || "Name " + (i + 1)) + "</option>"; }).join("") + "</select></div>" +
-      '<div id="su-err" class="err"></div><button class="btn primary block" data-act="su-save">Create flat</button></div>';
-  }
-  return h + "</div>";
+  h += '<button class="choice" data-act="ob-step" data-v="join"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></span><span class="main"><div class="t">Join a flat</div><div class="s">I have a code from my flatmate</div></span>' + CHEV + "</button>" +
+    '<button class="choice" data-act="ob-step" data-v="create"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="main"><div class="t">Create a new flat</div><div class="s">I\'m setting it up for everyone</div></span>' + CHEV + "</button></div>";
+  return h;
 }
 
-function approvalsCard(list) {
-  if (!list.length) return "";
-  return '<div class="card approve"><div class="card-h"><h2>Payments to approve</h2><span class="hint">' + list.length + '</span></div><div class="rows">' +
-    list.map(function (p) {
-      return '<div class="row"><span class="main"><span class="t">' + esc(nameOf(p.from)) + " says he paid you " + rs(p.amount) + '</span><span class="s">' + esc(p.method || "Cash") + " · " + fmtDate(p.date) +
-        (p.receipt ? ' · <button class="btn sm" style="min-height:28px" data-act="open-payment" data-id="' + esc(p.id) + '">See screenshot</button>' : "") + "</span></span>" +
-        '<span class="btnrow" style="flex:0 0 auto;gap:8px"><button class="btn sm" data-act="reject" data-id="' + esc(p.id) + '">Reject</button><button class="btn sm primary" data-act="approve" data-id="' + esc(p.id) + '">Approve</button></span></div>';
-    }).join("") + "</div></div>";
+// --- home ---
+function relRows(me) {
+  // every other member with my balance against him
+  var pr = pairs();
+  return S.members.filter(function (m) { return m.id !== me; }).map(function (m) {
+    var a = (pr.filter(function (p) { return p.from === m.id && p.to === me; })[0] || { amount: 0 }).amount;
+    var b = (pr.filter(function (p) { return p.from === me && p.to === m.id; })[0] || { amount: 0 }).amount;
+    return { m: m, v: a - b };
+  }).filter(function (r) { return r.m.active !== false || r.v; })
+    .sort(function (x, y) { return Math.abs(y.v) - Math.abs(x.v); });
+}
+function approvalsList(list) {
+  return list.map(function (p) {
+    return '<div class="row"><span class="main"><span class="t">' + esc(nameOf(p.from)) + " paid you " + rs(p.amount) + '</span><div class="s">' + esc(p.method || "Cash") + " · " + fmtDate(p.date) + "</div></span>" +
+      '<span class="end">' + (p.receipt ? '<button class="btn sm" data-act="open-payment" data-id="' + esc(p.id) + '">Screenshot</button>' : "") +
+      '<button class="btn sm" data-act="reject" data-id="' + esc(p.id) + '">Reject</button><button class="btn sm primary" data-act="approve" data-id="' + esc(p.id) + '">Approve</button></span></div>';
+  }).join("");
 }
 function renderHome() {
-  var net = balances(), pr = pairs(), me = myId();
-  var h = '<div class="stack">' + approvalsCard(myApprovals());
+  var me = myId(), h = '<div class="stack">';
+  var ap = myApprovals();
+  if (ap.length) h += '<div class="section-h"><h2>Waiting for your approval</h2></div><div class="card flush"><div class="list">' + approvalsList(ap) + "</div></div>";
   if (me) {
-    var sm = personSummary(me, pr);
-    var wsum = S.payments.filter(function (p) { return p.status === "pending" && p.from === me; }).reduce(function (a, p) { return a + p.amount; }, 0);
-    var n = Math.round(net[me] || 0);
-    h += '<div><div class="tiles">' +
-      '<button class="tile recv" data-act="open-list" data-v="receive"><span class="k">To receive</span><span class="v num">' + rs(sm.toReceive) + '</span><span class="s">' + (sm.receive.length ? "from " + people(sm.receive.length) + " · tap to see" : "Nobody owes you") + "</span></button>" +
-      '<button class="tile pay" data-act="open-list" data-v="pay"><span class="k">To pay</span><span class="v num">' + rs(sm.toPay) + '</span><span class="s">' + (sm.pay.length ? "to " + people(sm.pay.length) + " · tap to see" : "You owe nobody") + "</span></button></div>" +
-      '<div class="netline"><span class="muted">Overall: <b class="' + (n > 0 ? "good-t" : n < 0 ? "bad-t" : "") + ' num">' + (n > 0 ? "you get " + rs(n) : n < 0 ? "you owe " + rs(n) : "settled") + "</b></span>" +
-      (wsum ? '<span class="muted num">Waiting for approval: ' + rs(wsum) + "</span>" : "") + "</div></div>";
+    var sm = personSummary(me, pairs());
+    var waiting = S.payments.filter(function (p) { return p.status === "pending" && p.from === me; }).reduce(function (a, p) { return a + p.amount; }, 0);
+    var n = sm.toReceive - sm.toPay;
+    h += '<div class="card"><div class="summary">' +
+      '<button data-act="open-list" data-v="receive"><span class="k">You\'ll get</span><span class="v num good-t">' + rs(sm.toReceive) + '</span><span class="s">' + (sm.receive.length ? "from " + people(sm.receive.length) : "nobody owes you") + "</span></button>" +
+      '<button data-act="open-list" data-v="pay"><span class="k">You owe</span><span class="v num bad-t">' + rs(sm.toPay) + '</span><span class="s">' + (sm.pay.length ? "to " + people(sm.pay.length) : "you owe nobody") + "</span></button></div>" +
+      '<div class="netline"><span>Overall <b class="num ' + (n > 0 ? "good-t" : n < 0 ? "bad-t" : "") + '">' + (n ? signed(n) : "settled") + "</b></span>" +
+      (waiting ? '<span class="num">Awaiting approval ' + rs(waiting) + "</span>" : "") + "</div></div>";
+    var rows = relRows(me);
+    h += '<div class="section-h"><h2>Your balances</h2><button class="link" data-act="share-dues">Share</button></div>';
+    h += '<div class="card flush"><div class="list">' + (rows.length ? rows.map(function (r) {
+      var v = r.v;
+      return '<button class="row" data-act="open-person" data-id="' + esc(r.m.id) + '"><span class="avatar">' + initials(r.m.name) + '</span><span class="main"><span class="t">' + esc(r.m.name) + '</span><div class="s">' +
+        (v > 0 ? "owes you" : v < 0 ? "you owe" : "settled") + '</div></span><span class="end"><span class="amt num ' + (v > 0 ? "good-t" : v < 0 ? "bad-t" : "muted") + '">' + (v ? rs(v) : "—") + "</span>" + CHEV + "</span></button>";
+    }).join("") : '<div class="empty">Nobody else in this flat yet.</div>') + "</div></div>";
+  } else {
+    var net = balances();
+    h += '<div class="section-h"><h2>Flat balances</h2></div><div class="card flush"><div class="list">' + S.members.map(function (m) {
+      return '<button class="row" data-act="open-member" data-id="' + esc(m.id) + '"><span class="avatar">' + initials(m.name) + '</span><span class="main"><span class="t">' + esc(m.name) + '</span></span><span class="end">' + balPill(net[m.id] || 0) + "</span></button>";
+    }).join("") + "</div></div>";
   }
-  h += '<div class="card"><div class="card-h"><h2>Who owes whom</h2><span class="hint">' + (pr.length ? pr.length + (pr.length === 1 ? " payment" : " payments") : "") + "</span></div>";
-  if (!pr.length) h += '<div class="empty">Everyone is settled up.</div>';
-  else h += '<div class="rows">' + pr.map(function (x) {
-    return '<div class="row settle"><span class="who">' + esc(nameOf(x.from)) + '<span class="arrow">→</span>' + esc(nameOf(x.to)) + '</span><span class="amt num">' + rs(x.amount) + "</span>" +
-      (me && x.from === me ? '<button class="btn sm" data-act="add-payment" data-from="' + esc(x.from) + '" data-to="' + esc(x.to) + '" data-amt="' + x.amount + '">Pay</button>' : "") + "</div>";
-  }).join("") + "</div>";
-  h += '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="share-dues">Share on WhatsApp</button><button class="btn" data-act="copy-dues">Copy</button></div></div>';
-  h += '<div class="card"><div class="card-h"><h2>Members</h2><span class="hint">Tap for details</span></div><div class="rows">';
-  S.members.forEach(function (m) {
-    var v = net[m.id] || 0;
-    if (m.active === false && !Math.round(v)) return;
-    h += '<button class="row" data-act="open-member" data-id="' + esc(m.id) + '"><span class="avatar">' + initials(m.name) + '</span><span class="main"><span class="t">' + esc(m.name) +
-      (m.id === me ? ' <span class="muted small">(you)</span>' : "") + (m.active === false ? ' <span class="muted small">(moved out)</span>' : "") + "</span></span>" + balPill(v) + "</button>";
-  });
-  h += "</div></div>";
   var recent = S.expenses.concat(S.payments.map(function (p) { return Object.assign({ _pay: 1 }, p); })).sort(sortEntries).slice(0, 5);
-  h += '<div class="card"><div class="card-h"><h2>Recent</h2><button class="btn sm" data-tab="history">See all</button></div>';
-  h += recent.length ? '<div class="rows">' + recent.map(entryRow).join("") + "</div>" : '<div class="empty">No expenses yet. Tap + to add one.</div>';
-  return h + "</div></div>";
+  h += '<div class="section-h"><h2>Recent</h2>' + (recent.length ? '<button class="link" data-tab="history">See all</button>' : "") + "</div>";
+  h += '<div class="card flush"><div class="list">' + (recent.length ? recent.map(entryRow).join("") : '<div class="empty">No expenses yet. Tap + to add the first one.</div>') + "</div></div>";
+  return h + "</div>";
 }
 function entryRow(e) {
   if (e._pay) {
-    return '<button class="row" data-act="open-payment" data-id="' + esc(e.id) + '"><span class="avatar" style="background:var(--good-soft);color:var(--good)">↔</span><span class="main"><span class="t">' +
-      esc(nameOf(e.from)) + " paid " + esc(nameOf(e.to)) + statusPill(e) + '</span><span class="s">' + esc(e.method || "Cash") + " · " + fmtDate(e.date) + (e.receipt ? " · screenshot" : "") +
-      '</span></span><span class="amt num ' + (e.status === "rejected" ? "muted" : "good-t") + '">' + rs(e.amount) + "</span></button>";
+    return '<button class="row" data-act="open-payment" data-id="' + esc(e.id) + '"><span class="avatar">' + initials(nameOf(e.from)) + '</span><span class="main"><span class="t">' +
+      esc(nameOf(e.from)) + " paid " + esc(nameOf(e.to)) + statusPill(e) + '</span><div class="s">' + esc(e.method || "Cash") + " · " + fmtDate(e.date) +
+      '</div></span><span class="end"><span class="amt num ' + (e.status === "rejected" ? "muted" : "") + '">' + rs(e.amount) + "</span></span></button>";
   }
   var n = Object.keys(e.shares || {}).length;
   return '<button class="row" data-act="open-expense" data-id="' + esc(e.id) + '"><span class="avatar">' + initials(nameOf(e.paidBy)) + '</span><span class="main"><span class="t">' +
-    esc(e.note || MEAL_LABEL[e.meal] || "Expense") + '</span><span class="s">Paid by ' + esc(nameOf(e.paidBy)) + " · " + esc(MEAL_LABEL[e.meal] || "") + " · " + people(n) + " · " + fmtDate(e.date) +
-    (e.receipt ? " · screenshot" : "") + '</span></span><span class="amt num">' + rs(e.amount) + "</span></button>";
+    esc(itemTitle(e)) + '</span><div class="s">' + esc(nameOf(e.paidBy)) + " paid · " + people(n) + " · " + fmtDate(e.date) + '</div></span><span class="end"><span class="amt num">' + rs(e.amount) + "</span></span></button>";
 }
+
+// --- today ---
 function renderToday() {
-  var d = S.attDate, act = active();
+  var d = S.attDate, act = active(), me = myId();
   var h = '<div class="stack"><div class="card"><div class="datenav">' +
-    '<button class="iconbtn" data-act="day" data-n="-1" aria-label="Previous day">‹</button>' +
-    '<div class="lbl">' + (d === today() ? "Today · " : "") + fmtDate(d) + "</div>" +
-    '<button class="iconbtn" data-act="day" data-n="1" aria-label="Next day">›</button></div>' +
-    (d !== today() ? '<div style="text-align:center;margin-top:8px"><button class="btn sm" data-act="day-today">Back to today</button></div>' : "") +
-    '<p class="muted small" style="margin:10px 0 0;text-align:center">Tap a name to cross out anyone who isn\'t eating. That meal\'s cost is split only among the people still selected.</p></div>';
+    '<button class="icon-btn" data-act="day" data-n="-1" aria-label="Previous day">‹</button>' +
+    '<div class="lbl">' + (d === today() ? "Today" : fmtDate(d)) + '<div class="tiny muted" style="font-weight:400">' + (d === today() ? fmtDate(d) : '<button class="link tiny" data-act="day-today">Back to today</button>') + "</div></div>" +
+    '<button class="icon-btn" data-act="day" data-n="1" aria-label="Next day">›</button></div></div>' +
+    '<p class="small muted" style="margin:0 2px">Tap your name if you\'re not eating a meal. Its cost is split only between the people still selected.</p>';
   MEALS.forEach(function (ml) {
     var eaters = act.filter(function (m) { return eating(S.att, d, ml.k, m.id); });
     var ex = S.expenses.filter(function (e) { return e.date === d && e.meal === ml.k; });
     var spent = ex.reduce(function (a, e) { return a + (Number(e.amount) || 0); }, 0);
-    h += '<div class="card"><div class="meal-h"><h3>' + ml.label + '</h3><span class="muted small">' + eaters.length + ' eating</span></div><div class="chips">' +
+    h += '<div class="card stack tight"><div class="row" style="padding:0;border:0"><span class="main"><h3>' + ml.label + '</h3></span><span class="end small muted">' + eaters.length + ' eating</span></div><div class="chips">' +
       act.map(function (m) {
-        return '<button class="chip" aria-pressed="' + eating(S.att, d, ml.k, m.id) + '" data-act="toggle-eat" data-meal="' + ml.k + '" data-id="' + esc(m.id) + '">' + esc(m.name) + "</button>";
+        var can = canMarkAttendance(m.id);
+        return '<button class="chip strike" aria-pressed="' + eating(S.att, d, ml.k, m.id) + '" data-act="toggle-eat" data-meal="' + ml.k + '" data-id="' + esc(m.id) + '"' + (can ? "" : " disabled") + ">" + esc(m.name) + (m.id === me ? " (you)" : "") + "</button>";
       }).join("") + "</div>" +
-      '<div class="meal-foot"><span class="small ' + (spent ? "" : "muted") + ' num">' + (spent ? "Spent: <b>" + rs(spent) + "</b> (" + ex.length + (ex.length === 1 ? " entry" : " entries") + ")" : "Nothing spent yet") + "</span>" +
-      '<button class="btn sm" data-act="add-expense" data-meal="' + ml.k + '" data-date="' + d + '">+ ' + ml.label + " expense</button></div></div>";
+      '<div class="row" style="padding:4px 0 0;border:0"><span class="main small ' + (spent ? "" : "muted") + '">' + (spent ? "Spent <b class=\"num\">" + rs(spent) + "</b>" : "Nothing spent yet") + "</span>" +
+      '<span class="end"><button class="btn sm" data-act="add-expense" data-meal="' + ml.k + '" data-date="' + d + '">Add expense</button></span></div></div>';
   });
   return h + "</div>";
 }
+
+// --- history ---
 function renderHistory() {
   var list = [];
   if (S.hf !== "pay") list = list.concat(S.expenses);
   if (S.hf !== "exp") list = list.concat(S.payments.map(function (p) { return Object.assign({ _pay: 1 }, p); }));
   if (S.hm) list = list.filter(function (e) { return e._pay ? (e.from === S.hm || e.to === S.hm) : (e.paidBy === S.hm || (e.shares && S.hm in e.shares)); });
   list.sort(sortEntries);
-  var h = '<div class="stack"><div class="card stack" style="gap:10px"><div class="seg three">' +
+  var h = '<div class="stack"><div class="seg">' +
     [["all", "All"], ["exp", "Expenses"], ["pay", "Payments"]].map(function (f) { return '<button data-act="hf" data-v="' + f[0] + '" aria-pressed="' + (S.hf === f[0]) + '">' + f[1] + "</button>"; }).join("") +
-    '</div><select class="input" id="hm" aria-label="Filter by member"><option value="">All members</option>' +
-    S.members.map(function (m) { return '<option value="' + esc(m.id) + '"' + (S.hm === m.id ? " selected" : "") + ">" + esc(m.name) + "</option>"; }).join("") + "</select></div>";
-  if (!list.length) return h + '<div class="card empty">Nothing here yet.</div></div>';
+    '</div><select class="input" id="hm" aria-label="Filter by person"><option value="">Everyone</option>' +
+    S.members.map(function (m) { return '<option value="' + esc(m.id) + '"' + (S.hm === m.id ? " selected" : "") + ">" + esc(m.name) + "</option>"; }).join("") + "</select>";
+  if (!list.length) return h + '<div class="empty">Nothing here yet.</div></div>';
   var cur = null, chunk = [];
-  var flush = function () { if (chunk.length) h += '<div class="dayhead">' + fmtDate(cur) + '</div><div class="card" style="padding:6px 16px"><div class="rows">' + chunk.join("") + "</div></div>"; chunk = []; };
+  var flush = function () { if (chunk.length) h += '<div class="dayhead">' + fmtDate(cur) + '</div><div class="card flush"><div class="list">' + chunk.join("") + "</div></div>"; chunk = []; };
   list.slice(0, 300).forEach(function (e) { if (e.date !== cur) { flush(); cur = e.date; } chunk.push(entryRow(e)); });
   flush();
   return h + "</div>";
 }
+
+// --- report ---
 function renderReport() {
-  var m = S.month, R = monthData(m), pr = pairs();
+  var m = S.month, R = monthData(m), pr = pairs(), net = balances();
   var max = Math.max.apply(null, R.rows.map(function (r) { return r.paid; }).concat([1]));
   var h = '<div class="stack"><div class="card"><div class="datenav">' +
-    '<button class="iconbtn" data-act="month" data-n="-1" aria-label="Previous month">‹</button><div class="lbl">' + fmtMonth(m) + "</div>" +
-    '<button class="iconbtn" data-act="month" data-n="1" aria-label="Next month">›</button></div></div>';
-  h += '<div class="stats"><div class="stat"><div class="v num">' + rs(R.total) + '</div><div class="k">Total spent</div></div>' +
+    '<button class="icon-btn" data-act="month" data-n="-1" aria-label="Previous month">‹</button><div class="lbl">' + fmtMonth(m) + "</div>" +
+    '<button class="icon-btn" data-act="month" data-n="1" aria-label="Next month">›</button></div></div>';
+  h += '<div class="stats"><div class="stat"><div class="v num">' + rs(R.total) + '</div><div class="k">Spent</div></div>' +
     '<div class="stat"><div class="v num">' + R.meals + '</div><div class="k">Meals</div></div>' +
-    '<div class="stat"><div class="v num">' + R.ex.length + '</div><div class="k">Expenses</div></div></div>';
-  h += '<div class="card"><div class="card-h"><h2>Who spent how much</h2></div>';
-  if (!R.total) h += '<div class="empty">No expenses this month.</div>';
-  else h += '<div class="bars">' + R.rows.map(function (r) {
-    var pct = Math.round((r.paid / max) * 100), inside = pct > 55;
-    return '<div class="bar"><span class="n" title="' + esc(r.name) + '">' + esc(r.name) + '</span><div class="track"><div class="fill" style="width:' + pct + '%"></div><span class="val num" style="' +
-      (inside ? "right:" + (100 - pct) + "%;margin-right:8px;color:var(--surface)" : "left:" + pct + "%;margin-left:8px") + '">' + rs(r.paid) + "</span></div></div>";
-  }).join("") + "</div>";
+    '<div class="stat"><div class="v num">' + R.ex.length + '</div><div class="k">Entries</div></div></div>';
+  h += '<div class="section-h"><h2>Who paid how much</h2></div><div class="card">';
+  h += R.total ? '<div class="bars">' + R.rows.map(function (r) {
+    return '<div class="bar"><div class="top-l"><span>' + esc(r.name) + '</span><span class="num">' + rs(r.paid) + '</span></div><div class="track"><div class="fill" style="width:' + Math.round((r.paid / max) * 100) + '%"></div></div></div>';
+  }).join("") + "</div>" : '<div class="empty">No expenses this month.</div>';
   h += "</div>";
-  h += '<div class="card"><div class="card-h"><h2>Paid vs share</h2><span class="hint">' + MONTHS[+m.slice(5) - 1] + ' only</span></div><div class="tablewrap"><table class="t num"><thead><tr><th>Member</th><th>Paid</th><th>Share</th><th>Difference</th></tr></thead><tbody>' +
-    R.rows.map(function (r) {
-      var f = r.paid - r.share;
-      return "<tr><td>" + esc(r.name) + "</td><td>" + rs(r.paid) + "</td><td>" + rs(r.share) + '</td><td class="' + (f > 0 ? "good-t" : f < 0 ? "bad-t" : "") + '">' + (f > 0 ? "+" : f < 0 ? "−" : "") + rs(f) + "</td></tr>";
-    }).join("") + '</tbody><tfoot><tr><td><b>Total</b></td><td><b>' + rs(R.rows.reduce(function (a, r) { return a + r.paid; }, 0)) + "</b></td><td><b>" + rs(R.rows.reduce(function (a, r) { return a + r.share; }, 0)) + "</b></td><td></td></tr></tfoot></table></div></div>";
-  h += '<div class="card"><div class="card-h"><h2>Who owes whom</h2><span class="hint">all time, approved payments only</span></div>' +
-    (pr.length ? '<div class="rows">' + pr.map(function (x) { return '<div class="row"><span class="main t">' + esc(nameOf(x.from)) + '<span class="arrow">→</span>' + esc(nameOf(x.to)) + '</span><span class="amt num">' + rs(x.amount) + "</span></div>"; }).join("") + "</div>" : '<div class="empty">Everyone is settled up.</div>') + "</div>";
+  if (R.total) {
+    h += '<div class="section-h"><h2>Paid vs share</h2><span class="tiny muted">' + MONTHS[+m.slice(5) - 1] + '</span></div><div class="card"><div class="tablewrap"><table class="t num"><thead><tr><th>Name</th><th>Paid</th><th>Share</th><th>Diff</th></tr></thead><tbody>' +
+      R.rows.map(function (r) {
+        var f = r.paid - r.share;
+        return "<tr><td>" + esc(r.name) + "</td><td>" + rs(r.paid) + "</td><td>" + rs(r.share) + '</td><td class="' + (f > 0 ? "good-t" : f < 0 ? "bad-t" : "") + '">' + signed(f) + "</td></tr>";
+      }).join("") + "</tbody><tfoot><tr><td>Total</td><td>" + rs(R.rows.reduce(function (a, r) { return a + r.paid; }, 0)) + "</td><td>" + rs(R.rows.reduce(function (a, r) { return a + r.share; }, 0)) + "</td><td></td></tr></tfoot></table></div></div>";
+  }
+  h += '<div class="section-h"><h2>Everyone\'s balance</h2><span class="tiny muted">all time</span></div><div class="card flush"><div class="list">' + S.members.filter(function (mm) { return mm.active !== false || Math.round(net[mm.id] || 0); }).map(function (mm) {
+    return '<button class="row" data-act="open-member" data-id="' + esc(mm.id) + '"><span class="main"><span class="t">' + esc(mm.name) + '</span></span><span class="end">' + balPill(net[mm.id] || 0) + CHEV + "</span></button>";
+  }).join("") + "</div></div>";
+  h += '<div class="section-h"><h2>Who owes whom</h2></div><div class="card flush"><div class="list">' + (pr.length ? pr.map(function (x) {
+    return '<div class="row"><span class="main">' + esc(nameOf(x.from)) + ' <span class="muted">→</span> ' + esc(nameOf(x.to)) + '</span><span class="end amt num">' + rs(x.amount) + "</span></div>";
+  }).join("") : '<div class="empty">Everyone is settled up.</div>') + "</div></div>";
   h += '<div class="btnrow"><button class="btn primary" data-act="share-report">Share report</button><button class="btn" data-act="share-report-img">Share as image</button><button class="btn" data-act="copy-report">Copy</button></div>';
   return h + "</div>";
 }
@@ -549,14 +572,17 @@ function renderMain() {
 function renderAll() { renderHeader(); renderBanner(); renderMain(); renderNav(); }
 
 // ---------- sheets ----------
-function openSheet(s) { S.sheet = s; renderSheet(); }
+function openSheet(s, keepBack) { if (keepBack && S.sheet) s.back = S.sheet; S.sheet = s; renderSheet(); }
 function closeSheet() { S.sheet = null; $("sheetRoot").innerHTML = ""; }
+function closeOrBack() { if (S.sheet && S.sheet.back) { S.sheet = S.sheet.back; renderSheet(); } else closeSheet(); }
 function sheetWrap(title, body) {
-  return '<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><div class="sheet-h"><h2>' + esc(title) +
-    '</h2><button class="iconbtn" data-act="close" aria-label="Close">✕</button></div>' + body + "</div></div>";
+  var s = S.sheet;
+  return '<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><div class="sheet-grab"></div><div class="sheet-h">' +
+    (s && s.back ? '<button class="icon-btn" data-act="close" aria-label="Back">‹</button>' : "") + "<h2>" + esc(title) +
+    '</h2><button class="icon-btn" data-act="close-all" aria-label="Close">✕</button></div>' + body + "</div></div>";
 }
 function memberOptions(sel, list) {
-  return (list || active()).map(function (m) { return '<option value="' + esc(m.id) + '"' + (m.id === sel ? " selected" : "") + ">" + esc(m.name) + "</option>"; }).join("");
+  return list.map(function (m) { return '<option value="' + esc(m.id) + '"' + (m.id === sel ? " selected" : "") + ">" + esc(m.name) + "</option>"; }).join("");
 }
 function renderSheet() {
   var s = S.sheet, root = $("sheetRoot");
@@ -564,71 +590,90 @@ function renderSheet() {
   var html = "";
   if (s.type === "expense") html = sheetWrap("New expense", expenseForm(s));
   else if (s.type === "payment") html = sheetWrap("Record a payment", paymentForm(s));
+  else if (s.type === "person") html = sheetWrap(nameOf(s.id), personSheet(s.id));
   else if (s.type === "member") html = sheetWrap(nameOf(s.id), memberDetail(s.id));
   else if (s.type === "exp-detail") html = sheetWrap("Expense", expenseDetail(s));
   else if (s.type === "pay-detail") html = sheetWrap("Payment", paymentDetail(s));
-  else if (s.type === "list") html = sheetWrap(s.v === "receive" ? "You will receive" : "You have to pay", listBody(s.v));
-  else if (s.type === "approvals") html = sheetWrap("Payments to approve", approvalsSheet());
+  else if (s.type === "list") html = sheetWrap(s.v === "receive" ? "You'll get" : "You owe", listBody(s.v));
+  else if (s.type === "approvals") html = sheetWrap("Approvals", approvalsSheet());
   else if (s.type === "settings") html = sheetWrap("Settings", settingsBody());
-  else if (s.type === "image") html = sheetWrap("Report image", '<p class="muted small">Long-press the image to save or share it.</p><img class="receipt-img" src="' + s.src + '" alt="Report">');
-  else if (s.type === "copy") html = sheetWrap("Copy", '<p class="muted small">Select the text and copy it.</p><textarea class="input copybox" id="copybox" readonly>' + esc(s.text) + "</textarea>");
+  else if (s.type === "image") html = sheetWrap("Report image", '<p class="small muted" style="margin-bottom:12px">Long-press the image to save or share it.</p><img class="receipt-img" src="' + s.src + '" alt="Report">');
+  else if (s.type === "copy") html = sheetWrap("Copy", '<p class="small muted" style="margin-bottom:12px">Select the text and copy it.</p><textarea class="input copybox" id="copybox" readonly>' + esc(s.text) + "</textarea>");
   root.innerHTML = html;
   if (s.type === "copy") { var cb = $("copybox"); cb.focus(); cb.select(); }
   if (s.type === "expense") updatePreview();
   if (s.type === "payment") updatePayNote();
   if (s.focus && $(s.focus)) { $(s.focus).focus(); s.focus = null; }
 }
+
+// --- one person: how the amount adds up ---
+function personSheet(other) {
+  var me = myId();
+  if (!me) return '<div class="empty">Pick your name first.</div>';
+  var b = pairBreakdown(me, other, S.expenses, S.payments), v = b.total, name = esc(nameOf(other));
+  var h = '<div class="stack"><div class="card"><div class="small muted">' + (v > 0 ? name + " owes you" : v < 0 ? "You owe " + name : "You and " + name + " are settled") + '</div>' +
+    '<div class="num ' + (v > 0 ? "good-t" : v < 0 ? "bad-t" : "muted") + '" style="font-size:2rem;font-weight:600;letter-spacing:-0.02em">' + rs(v) + "</div>";
+  if (v > 0) h += '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="remind" data-id="' + esc(other) + '">Remind</button><button class="btn primary" data-act="add-payment" data-dir="in" data-other="' + esc(other) + '" data-amt="' + v + '">Mark as received</button></div>';
+  if (v < 0) h += '<div class="btnrow" style="margin-top:12px"><button class="btn primary" data-act="add-payment" data-dir="out" data-other="' + esc(other) + '" data-amt="' + (-v) + '">Pay ' + rs(v) + "</button></div>";
+  h += "</div>";
+  if (!b.items.length) return h + '<div class="empty">Nothing between you two yet.</div></div>';
+  h += '<div class="section-h"><h2>How it adds up</h2><span class="tiny muted">' + b.items.length + (b.items.length === 1 ? " item" : " items") + '</span></div><div class="card flush"><div class="list">';
+  h += b.items.slice().reverse().map(function (it) {
+    var cls = it.amount > 0 ? "good-t" : it.amount < 0 ? "bad-t" : "muted";
+    if (it.kind === "payment") {
+      var who = it.from === me ? "You paid " + name : name + " paid you";
+      return '<button class="row" data-act="open-payment" data-id="' + esc(it.id) + '" data-back="1"><span class="main"><span class="t">' + who + (it.counted ? "" : statusPill(it)) + '</span><div class="s">' + esc(it.method || "Cash") + " · " + fmtDate(it.date) +
+        (it.counted ? "" : " · not counted yet") + '</div></span><span class="end"><span class="amt num ' + cls + '">' + (it.counted ? signed(it.amount) : rs(it.paid)) + "</span></span></button>";
+    }
+    var sub = it.paidBy === me ? "You paid " + rs(it.total) + " · " + name + "'s share" : name + " paid " + rs(it.total) + " · your share";
+    return '<button class="row" data-act="open-expense" data-id="' + esc(it.id) + '" data-back="1"><span class="main"><span class="t">' + esc(itemTitle(it)) + '</span><div class="s">' + fmtDate(it.date) + " · " + sub + '</div></span><span class="end"><span class="amt num ' + cls + '">' + signed(it.amount) + "</span></span></button>";
+  }).join("");
+  h += '<div class="row"><span class="main t">Total</span><span class="end amt num ' + (v > 0 ? "good-t" : v < 0 ? "bad-t" : "") + '">' + signed(v) + "</span></div></div></div>";
+  return h + '<p class="tiny muted" style="margin:0 2px">+ means ' + name + " owes you for it, − means you owe " + name + ".</p></div>";
+}
 function listBody(v) {
   var me = myId();
-  if (!me) return '<div class="empty">Pick who you are first.</div>';
+  if (!me) return '<div class="empty">Pick your name first.</div>';
   var sm = personSummary(me, pairs());
   var list = v === "receive" ? sm.receive : sm.pay;
-  var total = v === "receive" ? sm.toReceive : sm.toPay;
   if (!list.length) return '<div class="empty">' + (v === "receive" ? "Nobody owes you anything." : "You don't owe anyone.") + "</div>";
-  return '<div class="stack"><div class="card"><div class="rows">' + list.map(function (x) {
+  return '<div class="stack"><div class="card flush"><div class="list">' + list.map(function (x) {
     var other = v === "receive" ? x.from : x.to;
-    var act = v === "receive"
-      ? '<button class="btn sm" data-act="remind" data-id="' + esc(x.from) + '" data-amt="' + x.amount + '">Remind</button><button class="btn sm" data-act="add-payment" data-from="' + esc(x.from) + '" data-to="' + esc(me) + '" data-amt="' + x.amount + '">Got it</button>'
-      : '<button class="btn sm primary" data-act="add-payment" data-from="' + esc(me) + '" data-to="' + esc(x.to) + '" data-amt="' + x.amount + '">Pay</button>';
-    return '<div class="row"><span class="avatar">' + initials(nameOf(other)) + '</span><button class="main" style="background:none;border:0;text-align:left;cursor:pointer;padding:0" data-act="open-member" data-id="' + esc(other) + '"><span class="t">' + esc(nameOf(other)) +
-      '</span><span class="s" style="display:block">' + (v === "receive" ? "owes you" : "you owe") + '</span></button><span class="amt num ' + (v === "receive" ? "good-t" : "bad-t") + '">' + rs(x.amount) + '</span><span class="btnrow" style="flex:0 0 auto;gap:6px">' + act + "</span></div>";
-  }).join("") + '</div><div class="netline" style="border-top:1px solid var(--line);padding-top:10px"><b>Total</b><b class="num ' + (v === "receive" ? "good-t" : "bad-t") + '">' + rs(total) + "</b></div></div>" +
-    '<p class="muted small" style="margin:0">' + (v === "receive"
-      ? "\"Got it\" records cash you received; it counts straight away because you are the one receiving."
-      : "When you pay, the other person gets a request to approve it. It counts once they approve.") + "</p></div>";
+    return '<button class="row" data-act="open-person" data-id="' + esc(other) + '" data-back="1"><span class="avatar">' + initials(nameOf(other)) + '</span><span class="main"><span class="t">' + esc(nameOf(other)) + '</span><div class="s">Tap to see what it\'s for</div></span><span class="end"><span class="amt num ' + (v === "receive" ? "good-t" : "bad-t") + '">' + rs(x.amount) + "</span>" + CHEV + "</span></button>";
+  }).join("") + '<div class="row"><span class="main t">Total</span><span class="end amt num ' + (v === "receive" ? "good-t" : "bad-t") + '">' + rs(v === "receive" ? sm.toReceive : sm.toPay) + "</span></div></div></div></div>";
 }
 function approvalsSheet() {
   var me = myId(), list = myApprovals();
   var waiting = S.payments.filter(function (p) { return p.status === "pending" && me && p.from === me; });
-  var h = list.length ? approvalsCard(list) : '<div class="card empty">Nothing to approve right now.</div>';
-  if (waiting.length) h += '<div class="card" style="margin-top:14px"><div class="card-h"><h2>Your payments waiting</h2></div><div class="rows">' + waiting.map(function (p) { return entryRow(Object.assign({ _pay: 1 }, p)); }).join("") + "</div></div>";
+  var h = list.length ? '<div class="card flush"><div class="list">' + approvalsList(list) + "</div></div>" : '<div class="empty">Nothing to approve right now.</div>';
+  if (waiting.length) h += '<div class="section-h"><h2>Your payments waiting</h2></div><div class="card flush"><div class="list">' + waiting.map(function (p) { return entryRow(Object.assign({ _pay: 1 }, p)); }).join("") + "</div></div>";
   return '<div class="stack">' + h + "</div>";
 }
 
 // --- expense form ---
 function expenseForm(s) {
+  var payers = payerChoices();
   return '<div class="stack">' +
-    '<div class="field"><label for="ex-amt">Amount (Rs)</label><input class="input amount-in num" id="ex-amt" inputmode="numeric" pattern="[0-9]*" placeholder="0" value="' + esc(s.amount || "") + '"></div>' +
-    '<div class="grid2"><div class="field"><label for="ex-by">Paid by</label><select class="input" id="ex-by">' + memberOptions(s.paidBy) + "</select></div>" +
-    '<div class="field"><label for="ex-date">Date</label><input class="input" type="date" id="ex-date" value="' + esc(s.date) + '"></div></div>' +
+    '<div class="field"><label for="ex-amt">Amount (Rs)</label><input class="input big num" id="ex-amt" inputmode="numeric" pattern="[0-9]*" placeholder="0" value="' + esc(s.amount || "") + '"></div>' +
+    '<div class="field"><label for="ex-note">What was it?</label><input class="input" id="ex-note" maxlength="60" placeholder="Roti, chicken, vegetables…" value="' + esc(s.note || "") + '"></div>' +
     '<div class="field"><span class="lab">Meal</span><div class="seg">' +
     ["nashta", "lunch", "dinner", "other"].map(function (k) { return '<button data-act="ex-meal" data-v="' + k + '" aria-pressed="' + (s.meal === k) + '">' + MEAL_LABEL[k] + "</button>"; }).join("") + "</div></div>" +
     '<div class="field"><span class="lab">Split between</span><div class="chips" id="ex-parts">' + partChips(s) + "</div>" +
-    '<div class="btnrow" style="gap:8px"><button class="btn sm" data-act="ex-all">Select all</button><button class="btn sm" data-act="ex-att">Use today\'s list</button></div>' +
-    '<span class="muted small">Crossed-out names are not part of this expense.</span></div>' +
-    '<div class="field"><label for="ex-note">What was bought (optional)</label><input class="input" id="ex-note" maxlength="60" placeholder="Chicken, vegetables, roti" value="' + esc(s.note || "") + '"></div>' +
+    '<div class="btnrow" style="gap:6px"><button class="link" data-act="ex-all">Everyone</button><button class="link" data-act="ex-att">Who\'s eating</button></div></div>' +
+    '<div class="grid2">' + (payers.length > 1 ? '<div class="field"><label for="ex-by">Paid by</label><select class="input" id="ex-by">' + memberOptions(s.paidBy, payers) + "</select></div>" : "") +
+    '<div class="field"><label for="ex-date">Date</label><input class="input" type="date" id="ex-date" value="' + esc(s.date) + '"></div></div>' +
     shotField(s) +
-    '<div class="preview num" id="ex-prev"></div><div class="err" id="ex-err"></div>' +
+    '<div class="note num" id="ex-prev"></div><div class="err" id="ex-err"></div>' +
     '<button class="btn primary block" data-act="ex-save"' + (s.saving ? " disabled" : "") + ">" + (s.saving ? "Saving…" : "Save expense") + "</button></div>";
 }
 function partChips(s) {
-  return active().map(function (m) { return '<button class="chip" aria-pressed="' + (s.parts.indexOf(m.id) >= 0) + '" data-act="ex-part" data-id="' + esc(m.id) + '">' + esc(m.name) + "</button>"; }).join("");
+  return active().map(function (m) { return '<button class="chip strike" aria-pressed="' + (s.parts.indexOf(m.id) >= 0) + '" data-act="ex-part" data-id="' + esc(m.id) + '">' + esc(m.name) + "</button>"; }).join("");
 }
 function shotField(s) {
-  return '<div class="field"><span class="lab">Screenshot or bill (optional)</span><div class="shot">' +
+  return '<div class="field"><span class="lab">Screenshot or bill <span class="muted" style="font-weight:400">(optional)</span></span><div class="shot">' +
     (s.img ? '<img src="' + s.img.preview + '" alt="Screenshot preview"><button class="btn sm" data-act="shot-clear">Remove</button>' :
-      '<label class="btn filebtn">Add screenshot<input type="file" accept="image/*" id="shot-in"></label>') +
-    (s.imgBusy ? '<span class="muted small">Shrinking image…</span>' : "") + "</div></div>";
+      '<label class="btn sm filebtn">Add screenshot<input type="file" accept="image/*" id="shot-in"></label>') +
+    (s.imgBusy ? '<span class="small muted">Preparing image…</span>' : "") + "</div></div>";
 }
 function readExpenseInputs() {
   var s = S.sheet; if (!s || s.type !== "expense") return;
@@ -643,16 +688,13 @@ function updatePreview() {
   var el = $("ex-prev"); if (!el) return;
   var amt = parseInt(s.amount, 10) || 0, parts = s.parts;
   if (!parts.length) { el.innerHTML = "Select at least one person."; return; }
-  if (!amt) { el.innerHTML = "Enter the amount to see everyone's share."; return; }
+  if (!amt) { el.innerHTML = "Enter the amount to see each share."; return; }
   var sh = splitAmount(amt, parts, s.paidBy);
   var vals = parts.map(function (p) { return sh[p]; });
   var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
-  var excluded = active().filter(function (m) { return parts.indexOf(m.id) < 0; }).map(function (m) { return m.name; });
   var extra = parts.filter(function (p) { return sh[p] === mx; });
-  el.innerHTML = "<b>" + rs(amt) + "</b> ÷ " + parts.length + " = <b>" + rs(mn) + "</b> each" +
-    (mn !== mx ? '<br><span class="muted small">' + rs(amt) + " doesn't divide evenly, so " + (extra.length === 1 ? "1 person pays" : extra.length + " people pay") + " Rs 1 more (" +
-      esc(extra.map(nameOf).join(", ")) + "). Total is exactly " + rs(amt) + ".</span>" : "") +
-    (excluded.length ? '<br><span class="muted">Not included: ' + esc(excluded.join(", ")) + "</span>" : "");
+  el.innerHTML = "<b>" + rs(mn) + "</b> each · " + people(parts.length) +
+    (mn !== mx ? '<div class="tiny muted" style="margin-top:4px">' + rs(amt) + " doesn't split evenly, so " + esc(extra.map(nameOf).join(", ")) + (extra.length === 1 ? " pays" : " pay") + " Rs 1 more. Total stays exactly " + rs(amt) + ".</div>" : "");
 }
 function attendanceFor(date) {
   if (date === S.attDate) return Promise.resolve(S.att);
@@ -679,7 +721,7 @@ function saveExpense() {
   if (amt > 10000000) { err.textContent = "That amount is too large."; return; }
   if (!s.parts.length) { err.textContent = "Select at least one person."; return; }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s.date)) { err.textContent = "Pick a valid date."; return; }
-  if (s.imgBusy) { err.textContent = "The screenshot is still processing. One second."; return; }
+  if (s.imgBusy) { err.textContent = "The screenshot is still being prepared."; return; }
   var shares = splitAmount(amt, s.parts, s.paidBy);
   s.saving = true; renderSheet();
   uploadReceipt(s.img && s.img.blob).then(function (path) {
@@ -687,26 +729,27 @@ function saveExpense() {
       note: (s.note || "").trim().slice(0, 60), shares: shares, receipt_path: path });
   }).then(function (r) {
     if (r.error) throw r.error;
-    closeSheet(); toast("Expense saved: " + rs(amt)); refresh("expenses");
+    closeSheet(); toast("Saved " + rs(amt)); refresh("expenses");
   }).catch(function (e) { s.saving = false; renderSheet(); fail(e); });
 }
 
-// --- payment form ---
+// --- payment form: always "I paid someone" or "someone paid me" ---
 function paymentForm(s) {
+  var me = myId();
+  var others = S.members.filter(function (m) { return m.id !== me; });
   return '<div class="stack">' +
-    '<div class="grid2"><div class="field"><label for="py-from">Paid by</label><select class="input" id="py-from">' + memberOptions(s.from, S.members) + "</select></div>" +
-    '<div class="field"><label for="py-to">Paid to</label><select class="input" id="py-to">' + memberOptions(s.to, S.members) + "</select></div></div>" +
-    '<div class="field"><label for="py-amt">Amount (Rs)</label><input class="input amount-in num" id="py-amt" inputmode="numeric" pattern="[0-9]*" placeholder="0" value="' + esc(s.amount || "") + '"></div>' +
+    '<div class="seg"><button data-act="py-dir" data-v="out" aria-pressed="' + (s.dir === "out") + '">I paid someone</button><button data-act="py-dir" data-v="in" aria-pressed="' + (s.dir === "in") + '">Someone paid me</button></div>' +
+    '<div class="field"><label for="py-other">' + (s.dir === "out" ? "Paid to" : "Paid by") + '</label><select class="input" id="py-other">' + memberOptions(s.other, others) + "</select></div>" +
+    '<div class="field"><label for="py-amt">Amount (Rs)</label><input class="input big num" id="py-amt" inputmode="numeric" pattern="[0-9]*" placeholder="0" value="' + esc(s.amount || "") + '"></div>' +
     '<div class="field"><span class="lab">How</span><div class="seg">' + METHODS.map(function (k) { return '<button data-act="py-method" data-v="' + k + '" aria-pressed="' + (s.method === k) + '">' + k + "</button>"; }).join("") + "</div></div>" +
     '<div class="field"><label for="py-date">Date</label><input class="input" type="date" id="py-date" value="' + esc(s.date) + '"></div>' +
     shotField(s) +
-    '<div class="preview" id="py-note"></div><div class="err" id="py-err"></div>' +
+    '<div class="note" id="py-note"></div><div class="err" id="py-err"></div>' +
     '<button class="btn primary block" data-act="py-save"' + (s.saving ? " disabled" : "") + ">" + (s.saving ? "Saving…" : "Save payment") + "</button></div>";
 }
 function readPaymentInputs() {
   var s = S.sheet; if (!s || s.type !== "payment") return;
-  if ($("py-from")) s.from = $("py-from").value;
-  if ($("py-to")) s.to = $("py-to").value;
+  if ($("py-other")) s.other = $("py-other").value;
   if ($("py-amt")) s.amount = $("py-amt").value.replace(/[^0-9]/g, "");
   if ($("py-date")) s.date = $("py-date").value || s.date;
 }
@@ -714,25 +757,24 @@ function updatePayNote() {
   var s = S.sheet; if (!s || s.type !== "payment") return;
   readPaymentInputs();
   var el = $("py-note"); if (!el) return;
-  if (s.from === s.to) { el.textContent = "Pick two different people."; return; }
-  el.innerHTML = s.to === myId()
-    ? "You are the receiver, so this counts straight away."
-    : "<b>" + esc(nameOf(s.to)) + "</b> will get a request to approve this. It counts in the balances only after " + esc(nameOf(s.to)) + " approves.";
+  el.innerHTML = s.dir === "in"
+    ? "You received it, so it counts straight away."
+    : "<b>" + esc(nameOf(s.other)) + "</b> gets a request to approve this. It counts once he approves.";
 }
 function savePayment() {
   var s = S.sheet; readPaymentInputs();
-  var amt = parseInt(s.amount, 10) || 0, err = $("py-err");
-  if (s.from === s.to) { err.textContent = "Payer and receiver must be different people."; return; }
+  var me = myId(), amt = parseInt(s.amount, 10) || 0, err = $("py-err");
+  if (!s.other) { err.textContent = "Pick the other person."; return; }
   if (amt <= 0) { err.textContent = "Enter the amount."; return; }
   if (amt > 10000000) { err.textContent = "That amount is too large."; return; }
-  if (s.imgBusy) { err.textContent = "The screenshot is still processing. One second."; return; }
-  var auto = s.to === myId();
+  if (s.imgBusy) { err.textContent = "The screenshot is still being prepared."; return; }
+  var from = s.dir === "out" ? me : s.other, to = s.dir === "out" ? s.other : me;
   s.saving = true; renderSheet();
   uploadReceipt(s.img && s.img.blob).then(function (path) {
-    return SB.from("payments").insert({ flat_id: S.flatId, from_member: s.from, to_member: s.to, amount: amt, method: s.method, date: s.date, receipt_path: path });
+    return SB.from("payments").insert({ flat_id: S.flatId, from_member: from, to_member: to, amount: amt, method: s.method, date: s.date, receipt_path: path });
   }).then(function (r) {
     if (r.error) throw r.error;
-    closeSheet(); toast(auto ? "Payment saved: " + rs(amt) : "Sent to " + nameOf(s.to) + " for approval"); refresh("payments");
+    closeSheet(); toast(s.dir === "in" ? "Saved " + rs(amt) : "Sent to " + nameOf(to) + " for approval"); refresh("payments");
   }).catch(function (e) { s.saving = false; renderSheet(); fail(e); });
 }
 function decide(id, status) {
@@ -741,7 +783,7 @@ function decide(id, status) {
   SB.from("payments").update({ status: status }).eq("id", id).select("id").then(function (r) {
     if (r.error) throw r.error;
     if (!r.data || !r.data.length) throw new Error("Couldn't update that payment.");
-    toast(status === "approved" ? "Approved: " + rs(p.amount) + " from " + nameOf(p.from) : "Rejected");
+    toast(status === "approved" ? "Approved " + rs(p.amount) + " from " + nameOf(p.from) : "Rejected");
     refresh("payments");
   }).catch(fail);
 }
@@ -749,88 +791,69 @@ function decide(id, status) {
 // --- details ---
 function receiptBlock(s) {
   if (s.img) return '<img class="receipt-img" src="' + esc(s.img) + '" alt="Screenshot">';
-  if (s.imgLoading) return '<div class="muted small">Loading screenshot…</div>';
-  if (s.imgMissing) return '<div class="muted small">Screenshot not found.</div>';
+  if (s.imgLoading) return '<div class="small muted">Loading screenshot…</div>';
+  if (s.imgMissing) return '<div class="small muted">Screenshot not found.</div>';
   return '<button class="btn block" data-act="load-receipt">See screenshot</button>';
 }
 function deleteBlock(s, allowed) {
   if (!allowed) return "";
-  if (s.confirm) return '<div class="card stack" style="gap:10px"><div style="font-weight:600">Delete this entry? Balances will be recalculated.</div><div class="btnrow"><button class="btn" data-act="del-no">Cancel</button><button class="btn danger" data-act="del-yes">Delete</button></div></div>';
+  if (s.confirm) return '<div class="card stack tight"><div>Delete this entry? Balances will update for everyone.</div><div class="btnrow"><button class="btn" data-act="del-no">Cancel</button><button class="btn danger" data-act="del-yes">Delete</button></div></div>';
   return '<button class="btn danger block" data-act="del-ask">Delete</button>';
 }
 function expenseDetail(s) {
   var e = findById(S.expenses, s.id);
   if (!e) return '<div class="empty">This entry was deleted.</div>';
-  var sh = e.shares || {};
-  var total = Object.keys(sh).reduce(function (a, k) { return a + sh[k]; }, 0);
+  var sh = e.shares || {}, ids = Object.keys(sh);
+  var total = ids.reduce(function (a, k) { return a + sh[k]; }, 0);
   var excl = S.members.filter(function (m) { return m.active !== false && !(m.id in sh); }).map(function (m) { return m.name; });
-  return '<div class="stack"><div class="card"><div class="small muted" style="font-weight:600">Paid by ' + esc(nameOf(e.paidBy)) + "</div>" +
-    '<div class="num" style="font-family:var(--font-display);font-size:2rem;font-weight:800">' + rs(e.amount) + "</div>" +
-    '<div class="small muted">' + esc(MEAL_LABEL[e.meal] || "") + " · " + fmtDate(e.date) + (e.note ? " · " + esc(e.note) : "") + (e.by ? " · added by " + esc(nameOf(e.by)) : "") + "</div></div>" +
-    '<div class="card"><div class="card-h"><h2>Shares</h2><span class="hint">' + people(Object.keys(sh).length) + '</span></div><div class="rows">' +
-    Object.keys(sh).map(function (id) { return '<div class="row"><span class="main t">' + esc(nameOf(id)) + (id === e.paidBy ? ' <span class="muted small">(paid)</span>' : ' <span class="muted small">owes ' + esc(nameOf(e.paidBy)) + "</span>") + '</span><span class="amt num">' + rs(sh[id]) + "</span></div>"; }).join("") +
-    '<div class="row"><span class="main t">Total</span><span class="amt num">' + rs(total) + "</span></div></div>" +
-    (excl.length ? '<div class="small muted" style="margin-top:8px">Not included: ' + esc(excl.join(", ")) + "</div>" : "") + "</div>" +
+  return '<div class="stack"><div class="card"><div class="small muted">' + esc(itemTitle(e)) + " · " + fmtDate(e.date) + '</div><div class="num" style="font-size:2rem;font-weight:600;letter-spacing:-0.02em">' + rs(e.amount) + '</div><div class="small muted">Paid by ' + esc(nameOf(e.paidBy)) + (e.by && e.by !== e.paidBy ? " · added by " + esc(nameOf(e.by)) : "") + "</div></div>" +
+    '<div class="section-h"><h2>Shares</h2><span class="tiny muted">' + people(ids.length) + '</span></div><div class="card flush"><div class="list">' +
+    ids.map(function (id) { return '<div class="row"><span class="main">' + esc(nameOf(id)) + (id === e.paidBy ? ' <span class="muted small">· paid</span>' : "") + '</span><span class="end amt num">' + rs(sh[id]) + "</span></div>"; }).join("") +
+    '<div class="row"><span class="main t">Total</span><span class="end amt num">' + rs(total) + "</span></div></div></div>" +
+    (excl.length ? '<p class="small muted" style="margin:0 2px">Not included: ' + esc(excl.join(", ")) + "</p>" : "") +
     (e.receipt ? receiptBlock(s) : "") + deleteBlock(s, canDeleteExpense(e)) + "</div>";
 }
 function paymentDetail(s) {
   var p = findById(S.payments, s.id);
   if (!p) return '<div class="empty">This entry was deleted.</div>';
-  var st = p.status === "pending" ? "Waiting for " + nameOf(p.to) + " to approve" : p.status === "rejected" ? "Rejected by " + nameOf(p.to) + ", doesn't count" : "Approved, counted in balances";
-  return '<div class="stack"><div class="card"><div class="small muted" style="font-weight:600">' + esc(nameOf(p.from)) + " paid " + esc(nameOf(p.to)) + statusPill(p) + "</div>" +
-    '<div class="num" style="font-family:var(--font-display);font-size:2rem;font-weight:800">' + rs(p.amount) + "</div>" +
-    '<div class="small muted">' + esc(p.method || "Cash") + " · " + fmtDate(p.date) + '</div><div class="small" style="margin-top:8px;font-weight:600">' + esc(st) + "</div></div>" +
-    (canApprove(p) ? '<div class="btnrow"><button class="btn" data-act="reject" data-id="' + esc(p.id) + '">Reject</button><button class="btn primary" data-act="approve" data-id="' + esc(p.id) + '">Approve ' + rs(p.amount) + "</button></div>"
-      : p.status === "pending" ? '<div class="small muted">Only ' + esc(nameOf(p.to)) + " can approve this, from his own phone.</div>" : "") +
+  var st = p.status === "pending" ? "Waiting for " + nameOf(p.to) + " to approve" : p.status === "rejected" ? "Rejected by " + nameOf(p.to) + ", not counted" : "Approved and counted";
+  return '<div class="stack"><div class="card"><div class="small muted">' + esc(nameOf(p.from)) + " paid " + esc(nameOf(p.to)) + '</div><div class="num" style="font-size:2rem;font-weight:600;letter-spacing:-0.02em">' + rs(p.amount) + '</div><div class="small muted">' + esc(p.method || "Cash") + " · " + fmtDate(p.date) + "</div>" +
+    '<div style="margin-top:10px">' + (p.status === "approved" ? '<span class="pill good">' + st + "</span>" : p.status === "pending" ? '<span class="pill wait">' + esc(st) + "</span>" : '<span class="pill even">' + esc(st) + "</span>") + "</div></div>" +
+    (canApprove(p) ? '<div class="btnrow"><button class="btn" data-act="reject" data-id="' + esc(p.id) + '">Reject</button><button class="btn primary" data-act="approve" data-id="' + esc(p.id) + '">Approve ' + rs(p.amount) + "</button></div>" : "") +
     (p.receipt ? receiptBlock(s) : "") + deleteBlock(s, canDeletePayment(p)) + "</div>";
 }
 function memberDetail(id) {
-  var net = balances()[id] || 0, sm = personSummary(id, pairs());
+  var net = Math.round(balances()[id] || 0);
   var t = memberTotals(memberIds(), S.expenses, S.payments)[id] || { paid: 0, share: 0, sent: 0, received: 0 };
-  var list = S.expenses.filter(function (e) { return e.paidBy === id || (e.shares && id in e.shares); })
-    .concat(S.payments.filter(function (p) { return p.from === id || p.to === id; }).map(function (p) { return Object.assign({ _pay: 1 }, p); }))
-    .sort(sortEntries);
-  var n = Math.round(net);
-  var plist = function (l, key, good) { return l.map(function (x) { return '<div class="row"><span class="main t">' + esc(nameOf(x[key])) + '</span><span class="amt num ' + (good ? "good-t" : "bad-t") + '">' + rs(x.amount) + "</span></div>"; }).join(""); };
-  return '<div class="stack"><div class="tiles"><div class="tile recv" style="cursor:default"><span class="k">Gets</span><span class="v num">' + rs(sm.toReceive) + '</span><span class="s">' + (n > 0 ? "Overall +" + rs(n) : "") + "</span></div>" +
-    '<div class="tile pay" style="cursor:default"><span class="k">Owes</span><span class="v num">' + rs(sm.toPay) + '</span><span class="s">' + (n < 0 ? "Overall −" + rs(n) : "") + "</span></div></div>" +
-    ((sm.receive.length || sm.pay.length) ? '<div class="card">' +
-      (sm.receive.length ? '<div class="card-h"><h2>Gets from</h2></div><div class="rows">' + plist(sm.receive, "from", true) + "</div>" : "") +
-      (sm.pay.length ? '<div class="card-h" style="margin-top:' + (sm.receive.length ? "14px" : "0") + '"><h2>Owes to</h2></div><div class="rows">' + plist(sm.pay, "to", false) + "</div>" : "") + "</div>" : "") +
-    '<div class="stats two"><div class="stat"><div class="v num">' + rs(t.paid) + '</div><div class="k">Spent on flat</div></div>' +
-    '<div class="stat"><div class="v num">' + rs(t.share) + '</div><div class="k">His share</div></div>' +
-    '<div class="stat"><div class="v num">' + rs(t.sent) + '</div><div class="k">Payments made</div></div>' +
-    '<div class="stat"><div class="v num">' + rs(t.received) + '</div><div class="k">Payments received</div></div></div>' +
-    '<div class="small muted num">Check: spent ' + rs(t.paid) + " − share " + rs(t.share) + " + paid out " + rs(t.sent) + " − received " + rs(t.received) + " = " + (n < 0 ? "−" : n > 0 ? "+" : "") + rs(n) + " (approved payments only)</div>" +
-    '<div class="card" style="padding:6px 16px"><div class="rows">' + (list.length ? list.slice(0, 100).map(function (e) {
-      if (e._pay) return entryRow(e);
-      var mine = e.shares && e.shares[id] ? e.shares[id] : 0;
-      var eff = (e.paidBy === id ? e.amount : 0) - mine;
-      return '<button class="row" data-act="open-expense" data-id="' + esc(e.id) + '"><span class="main"><span class="t">' + esc(e.note || MEAL_LABEL[e.meal] || "Expense") + '</span><span class="s">' +
-        fmtDate(e.date) + " · " + (e.paidBy === id ? "paid " + rs(e.amount) : "paid by " + esc(nameOf(e.paidBy))) + (mine ? " · share " + rs(mine) : " · not included") + "</span></span>" +
-        '<span class="amt num ' + (eff > 0 ? "good-t" : eff < 0 ? "bad-t" : "muted") + '">' + (eff > 0 ? "+" : eff < 0 ? "−" : "") + rs(eff) + "</span></button>";
-    }).join("") : '<div class="empty">No entries yet.</div>') + "</div></div></div>";
+  return '<div class="stack"><div class="card"><div class="small muted">Overall</div><div class="num ' + (net > 0 ? "good-t" : net < 0 ? "bad-t" : "muted") + '" style="font-size:2rem;font-weight:600">' + (net ? (net > 0 ? "gets " : "owes ") + rs(net) : "settled") + "</div></div>" +
+    '<div class="stats two"><div class="stat"><div class="v num">' + rs(t.paid) + '</div><div class="k">Spent on the flat</div></div><div class="stat"><div class="v num">' + rs(t.share) + '</div><div class="k">His share</div></div>' +
+    '<div class="stat"><div class="v num">' + rs(t.sent) + '</div><div class="k">Payments made</div></div><div class="stat"><div class="v num">' + rs(t.received) + '</div><div class="k">Payments received</div></div></div>' +
+    '<p class="tiny muted" style="margin:0 2px">spent − share + paid − received = ' + signed(net) + " (approved payments only)</p>" +
+    (myId() && id !== myId() ? '<button class="btn block" data-act="open-person" data-id="' + esc(id) + '" data-back="1">See what\'s between you two</button>' : "") + "</div>";
 }
+
+// --- settings ---
 function settingsBody() {
-  var net = balances(), owner = isOwner(), me = myId();
-  var h = '<div class="stack">';
-  h += '<div class="card stack" style="gap:10px"><div class="card-h" style="margin:0"><h2>Invite flatmates</h2></div><div class="codebox">' + esc(S.flat ? S.flat.code : "") + '</div>' +
-    '<p class="muted small" style="margin:0">Send them the app and this code. They open the app, tap "Join flat" and type the code.</p>' +
-    '<button class="btn primary block" data-act="share-invite">Share invite on WhatsApp</button></div>';
-  h += '<div class="card stack" style="gap:10px"><div class="field"><label for="st-me">Who are you on this phone?</label><select class="input" id="st-me"><option value=""' + (me ? "" : " selected") + '>Pick your name</option>' +
-    active().map(function (m) { var tk = takenByOther(m); return '<option value="' + esc(m.id) + '"' + (m.id === me ? " selected" : "") + (tk ? " disabled" : "") + ">" + esc(m.name) + (tk ? " (linked to another phone)" : "") + "</option>"; }).join("") +
-    '</select><span class="muted small">Your name is linked to this phone, so only you can approve payments made to you.</span></div></div>';
-  h += '<div class="card stack" style="gap:10px"><div class="field"><label for="st-name">Flat name</label><input class="input" id="st-name" maxlength="40" value="' + esc(flatName()) + '"></div><button class="btn" data-act="st-name-save">Save name</button></div>';
-  h += '<div class="card"><div class="card-h"><h2>Members</h2></div><div class="rows memlist">' + S.members.map(function (m) {
-    var off = m.active === false;
-    return '<div class="row"><input class="input" id="mn-' + esc(m.id) + '" value="' + esc(m.name) + '" maxlength="30" aria-label="Name of ' + esc(m.name) + '">' +
-      '<button class="btn sm" data-act="mem-rename" data-id="' + esc(m.id) + '">Save</button>' +
-      (off ? '<button class="btn sm" data-act="mem-on" data-id="' + esc(m.id) + '">Restore</button>' : '<button class="btn sm danger" data-act="mem-off" data-id="' + esc(m.id) + '">Remove</button>') + "</div>" +
-      ((off || (m.uid && owner && m.uid !== S.uid)) ? '<div class="small muted" style="margin:-6px 0 6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">' + (off ? "Moved out" + (Math.round(net[m.id] || 0) ? " · " + balPill(net[m.id]) : "") : "") +
-        (m.uid && owner && m.uid !== S.uid ? '<button class="btn sm" data-act="mem-unlink" data-id="' + esc(m.id) + '">Unlink phone</button>' : "") + "</div>" : "");
-  }).join("") + "</div>";
-  h += '<div class="row" style="border-top:1px solid var(--line);margin-top:6px;padding-top:12px"><input class="input" id="mem-new" maxlength="30" placeholder="New member\'s name" aria-label="New member\'s name"><button class="btn sm primary" data-act="mem-add">Add</button></div>';
-  h += '<div class="small muted" style="margin-top:8px">Removing someone keeps his past entries and balance; he just won\'t appear in new splits.' + (owner ? " If someone changes phones, use \"Unlink phone\" so he can pick his name again." : "") + "</div></div>";
+  var owner = isOwner(), me = myId();
+  var h = '<div class="stack"><div class="card stack tight"><h3>Invite flatmates</h3><div class="codebox">' + esc(S.flat ? S.flat.code : "") + '</div>' +
+    '<p class="small muted">They open the app, tap “Join a flat” and type this code.</p><button class="btn primary block" data-act="share-invite">Share invite</button></div>';
+  if (!me) {
+    h += '<div class="card stack tight"><div class="field"><label for="st-me">Who are you?</label><select class="input" id="st-me"><option value="">Pick your name</option>' +
+      active().map(function (m) { var tk = takenByOther(m); return '<option value="' + esc(m.id) + '"' + (tk ? " disabled" : "") + ">" + esc(m.name) + (tk ? " (linked)" : "") + "</option>"; }).join("") + "</select></div></div>";
+  }
+  if (owner) h += '<div class="card stack tight"><div class="field"><label for="st-name">Flat name</label><input class="input" id="st-name" maxlength="40" value="' + esc(flatName()) + '"></div><button class="btn" data-act="st-name-save">Save</button></div>';
+  h += '<div class="section-h"><h2>Members</h2><span class="tiny muted">' + (owner ? "you manage this flat" : "managed by the flat owner") + '</span></div><div class="card flush"><div class="list">' + S.members.map(function (m) {
+    var off = m.active === false, editable = canEditMember(m);
+    var tag = m.id === me ? "you" : m.uid ? "linked" : "no phone yet";
+    if (!editable) return '<div class="row"><span class="avatar">' + initials(m.name) + '</span><span class="main"><span class="t">' + esc(m.name) + '</span><div class="s">' + tag + (off ? " · moved out" : "") + "</div></span></div>";
+    return '<div class="row"><input class="input" id="mn-' + esc(m.id) + '" value="' + esc(m.name) + '" maxlength="30" aria-label="Name of ' + esc(m.name) + '" style="flex:1 1 9rem;min-height:42px">' +
+      '<span class="end"><button class="btn sm" data-act="mem-rename" data-id="' + esc(m.id) + '">Save</button>' +
+      (owner && m.id !== me ? (off ? '<button class="btn sm" data-act="mem-on" data-id="' + esc(m.id) + '">Restore</button>' : '<button class="btn sm danger" data-act="mem-off" data-id="' + esc(m.id) + '">Remove</button>') : "") +
+      (owner && m.uid && m.uid !== S.uid ? '<button class="btn sm" data-act="mem-unlink" data-id="' + esc(m.id) + '">Unlink phone</button>' : "") + "</span>" +
+      '<div class="s" style="flex-basis:100%;color:var(--muted);font-size:.8125rem;margin-top:-4px">' + tag + (off ? " · moved out" : "") + "</div></div>";
+  }).join("") + "</div></div>";
+  if (owner) h += '<div class="row" style="border:0;padding:0"><input class="input" id="mem-new" maxlength="30" placeholder="Add a member" aria-label="New member\'s name" style="flex:1 1 10rem"><button class="btn" data-act="mem-add">Add</button></div>' +
+    '<p class="tiny muted" style="margin:0 2px">Removing someone keeps his past entries. If someone changes phone, unlink it so he can pick his name again.</p>';
   h += '<button class="btn block" data-act="switch-flat">Switch or join another flat</button>';
   return h + "</div>";
 }
@@ -844,9 +867,10 @@ function setMe(id) {
   SB.rpc("claim_member", { p_member: id }).then(function (r) {
     if (r.error) throw r.error;
     return loaders.members();
-  }).then(function () { renderAll(); if (S.sheet && S.sheet.type === "settings") renderSheet(); toast("You're " + nameOf(id) + " on this phone"); }).catch(fail);
+  }).then(function () { renderAll(); if (S.sheet) renderSheet(); toast("You're " + nameOf(id) + " on this phone"); }).catch(fail);
 }
 function toggleEat(meal, mid) {
+  if (!canMarkAttendance(mid)) { toast("You can only change your own meals."); return; }
   var d = S.attDate, key = d + "_" + mid;
   var cur = S.att[key] || {};
   var next = { flat_id: S.flatId, date: d, member_id: mid, nashta: cur.nashta !== false, lunch: cur.lunch !== false, dinner: cur.dinner !== false };
@@ -856,13 +880,26 @@ function toggleEat(meal, mid) {
   SB.from("attendance").upsert(next, { onConflict: "flat_id,date,member_id" }).then(function (r) { if (r.error) throw r.error; }).catch(function (e) { fail(e); refresh("attendance"); });
 }
 function shareReportImage() {
-  var c = drawReport();
-  var dataUrl = c.toDataURL("image/png");
+  var dataUrl = drawReport().toDataURL("image/png");
   if (Cap.Filesystem && Cap.Share) {
     Cap.Filesystem.writeFile({ path: "hisaab-" + S.month + ".png", data: dataUrl.split(",")[1], directory: "CACHE" }).then(function (res) {
       return Cap.Share.share({ title: flatName() + " report", files: [res.uri] });
     }).catch(function () { openSheet({ type: "image", src: dataUrl }); });
   } else openSheet({ type: "image", src: dataUrl });
+}
+function startPayment(dir, other, amt) {
+  var me = myId();
+  if (!me) { toast("Pick your name first."); return; }
+  var pr = pairs();
+  if (!other) {
+    var t = pr.filter(function (x) { return dir === "out" ? x.from === me : x.to === me; })[0];
+    other = t ? (dir === "out" ? t.to : t.from) : (S.members.filter(function (m) { return m.id !== me; })[0] || {}).id;
+  }
+  if (!amt) {
+    var v = pairBreakdown(me, other, S.expenses, S.payments).total;
+    amt = dir === "out" ? (v < 0 ? -v : "") : (v > 0 ? v : "");
+  }
+  openSheet({ type: "payment", dir: dir, other: other, amount: amt ? String(amt) : "", method: "JazzCash", date: today(), img: null, focus: "py-amt" });
 }
 
 document.addEventListener("click", function (ev) {
@@ -870,30 +907,21 @@ document.addEventListener("click", function (ev) {
   if (!el) return;
   var tab = el.getAttribute("data-tab");
   if (tab && !el.hasAttribute("data-act")) { closeSheet(); setTab(tab); return; }
-  var a = el.getAttribute("data-act"), id = el.getAttribute("data-id"), s = S.sheet;
+  var a = el.getAttribute("data-act"), id = el.getAttribute("data-id"), s = S.sheet, back = el.hasAttribute("data-back");
   switch (a) {
     case "overlay": if (ev.target === el) closeSheet(); break;
-    case "close": closeSheet(); break;
+    case "close": closeOrBack(); break;
+    case "close-all": closeSheet(); break;
     case "retry-boot": boot(); break;
-    case "reload": S.loadError = ""; loadEverything(); break;
+    case "reload": loadEverything(); break;
     case "open-flat": openFlat(id); break;
-    case "ob-create-open": readOnboard(); S.onboard.mode = "create"; renderMain(); break;
-    case "ob-join": {
-      readOnboard();
-      var code = (S.onboard.code || "").trim().toUpperCase(), cerr = $("ob-code-err");
-      if (!/^[A-Z0-9]{6}$/.test(code)) { cerr.textContent = "The code has 6 letters/numbers."; break; }
-      el.disabled = true; el.textContent = "Joining…";
-      SB.rpc("join_flat", { p_code: code }).then(function (r) {
-        if (r.error) throw r.error;
-        S.onboard = null; openFlat(r.data);
-      }).catch(function (e) { el.disabled = false; el.textContent = "Join flat"; cerr.textContent = /No flat/.test(e.message || "") ? "No flat has that code. Check it and try again." : errText(e); });
-      break;
-    }
-    case "su-more": readOnboard(); S.onboard.members.push(""); renderMain(); break;
-    case "su-save": createFlat(el); break;
+    case "ob-step": readOnboard(); S.ob.step = el.getAttribute("data-v"); renderMain(); window.scrollTo(0, 0); break;
+    case "ob-more": readOnboard(); S.ob.members.push(""); renderMain(); break;
+    case "ob-join": joinFlat(el); break;
+    case "ob-create": createFlat(el); break;
     case "set-me": setMe(id); break;
     case "add-self": {
-      var sn = $("self-name").value.trim().slice(0, 30);
+      var sn = ($("self-name").value || "").trim().slice(0, 30);
       if (!sn) { toast("Type your name first."); break; }
       if (S.members.some(function (m) { return (m.name || "").trim().toLowerCase() === sn.toLowerCase(); })) { toast(sn + " is already in the list. Tap that name instead."); break; }
       SB.from("members").insert({ flat_id: S.flatId, name: sn, user_id: S.uid }).then(function (r) {
@@ -904,18 +932,18 @@ document.addEventListener("click", function (ev) {
     case "open-settings": openSheet({ type: "settings" }); break;
     case "open-approvals": openSheet({ type: "approvals" }); break;
     case "open-list": openSheet({ type: "list", v: el.getAttribute("data-v") }); break;
-    case "open-member": openSheet({ type: "member", id: id }); break;
-    case "open-expense": openSheet({ type: "exp-detail", id: id }); break;
-    case "open-payment": openSheet({ type: "pay-detail", id: id }); break;
+    case "open-person": openSheet({ type: "person", id: id }, back); break;
+    case "open-member": openSheet({ type: "member", id: id }, back); break;
+    case "open-expense": openSheet({ type: "exp-detail", id: id }, back); break;
+    case "open-payment": openSheet({ type: "pay-detail", id: id }, back); break;
     case "approve": decide(id, "approved"); break;
     case "reject": decide(id, "rejected"); break;
     case "share-dues": shareText(duesText()); break;
-    case "copy-dues": copyText(duesText()); break;
     case "share-report": shareText(reportText(S.month)); break;
     case "copy-report": copyText(reportText(S.month)); break;
     case "share-report-img": shareReportImage(); break;
     case "share-invite": shareText(inviteText()); break;
-    case "remind": shareText(remindText(id, +el.getAttribute("data-amt"))); break;
+    case "remind": shareText(remindText(id)); break;
     case "day": S.attDate = shiftDay(S.attDate, +el.getAttribute("data-n")); S.att = {}; renderMain(); refresh("attendance"); break;
     case "day-today": S.attDate = today(); S.att = {}; renderMain(); refresh("attendance"); break;
     case "month": S.month = shiftMonth(S.month, +el.getAttribute("data-n")); renderMain(); break;
@@ -923,9 +951,9 @@ document.addEventListener("click", function (ev) {
     case "toggle-eat": toggleEat(el.getAttribute("data-meal"), id); break;
     case "add-expense": {
       if (S.view !== "app" || !S.loaded || !active().length) break;
-      var me = myId();
-      var payer = me && member(me).active !== false ? me : active()[0].id;
-      openSheet({ type: "expense", amount: "", paidBy: payer, date: el.getAttribute("data-date") || today(), meal: el.getAttribute("data-meal") || defaultMeal(),
+      var payers = payerChoices();
+      if (!payers.length) { toast("Pick your name first, then add expenses."); break; }
+      openSheet({ type: "expense", amount: "", paidBy: payers[0].id, date: el.getAttribute("data-date") || today(), meal: el.getAttribute("data-meal") || defaultMeal(),
         note: "", parts: active().map(function (m) { return m.id; }), img: null, focus: "ex-amt" });
       prefillParts(); break;
     }
@@ -937,17 +965,8 @@ document.addEventListener("click", function (ev) {
     case "ex-all": readExpenseInputs(); s.parts = active().map(function (m) { return m.id; }); refreshParts(); break;
     case "ex-att": readExpenseInputs(); prefillParts(); break;
     case "ex-save": saveExpense(); break;
-    case "add-payment": {
-      if (!S.members.length) break;
-      var my = myId();
-      var from = el.getAttribute("data-from") || my || active()[0].id;
-      var to = el.getAttribute("data-to");
-      var pr = pairs();
-      if (!to) { var t1 = pr.filter(function (x) { return x.from === from; })[0]; to = t1 ? t1.to : (S.members.filter(function (m) { return m.id !== from; })[0] || {}).id; }
-      var amt = el.getAttribute("data-amt");
-      if (!amt) { var t2 = pr.filter(function (x) { return x.from === from && x.to === to; })[0]; amt = t2 ? String(t2.amount) : ""; }
-      openSheet({ type: "payment", from: from, to: to, amount: amt, method: "JazzCash", date: today(), img: null, focus: "py-amt" }); break;
-    }
+    case "add-payment": startPayment(el.getAttribute("data-dir") || "out", el.getAttribute("data-other"), el.getAttribute("data-amt")); break;
+    case "py-dir": readPaymentInputs(); s.dir = el.getAttribute("data-v"); s.amount = ""; renderSheet(); break;
     case "py-method": readPaymentInputs(); s.method = el.getAttribute("data-v"); renderSheet(); break;
     case "py-save": savePayment(); break;
     case "shot-clear": if (s.type === "expense") readExpenseInputs(); else readPaymentInputs(); s.img = null; renderSheet(); break;
@@ -970,21 +989,21 @@ document.addEventListener("click", function (ev) {
       var it = findById(table === "expenses" ? S.expenses : S.payments, s.id);
       SB.from(table).delete().eq("id", s.id).select("id").then(function (r) {
         if (r.error) throw r.error;
-        if (!r.data || !r.data.length) throw new Error("You're not allowed to delete this one.");
+        if (!r.data || !r.data.length) throw new Error("You can only delete entries you added.");
         if (it && it.receiptPath) SB.storage.from("receipts").remove([it.receiptPath]).catch(function () {});
-        closeSheet(); toast("Deleted"); refresh(table);
+        closeOrBack(); toast("Deleted"); refresh(table);
       }).catch(fail);
       break;
     }
     case "st-name-save": {
       var nm = $("st-name").value.trim().slice(0, 40);
       if (!nm) { toast("The name can't be empty."); break; }
-      SB.from("flats").update({ name: nm }).eq("id", S.flatId).then(function (r) { if (r.error) throw r.error; toast("Name saved"); refresh("flat"); }).catch(fail); break;
+      SB.from("flats").update({ name: nm }).eq("id", S.flatId).select("id").then(function (r) { if (r.error) throw r.error; if (!r.data || !r.data.length) throw new Error("Only the flat owner can rename the flat."); toast("Saved"); refresh("flat"); }).catch(fail); break;
     }
     case "mem-rename": {
       var v = $("mn-" + id).value.trim().slice(0, 30);
       if (!v) { toast("The name can't be empty."); break; }
-      SB.from("members").update({ name: v }).eq("id", id).then(function (r) { if (r.error) throw r.error; toast("Name updated"); refresh("members"); }).catch(fail); break;
+      SB.from("members").update({ name: v }).eq("id", id).then(function (r) { if (r.error) throw r.error; toast("Saved"); refresh("members"); }).catch(fail); break;
     }
     case "mem-off": SB.from("members").update({ active: false }).eq("id", id).then(function (r) { if (r.error) throw r.error; toast(nameOf(id) + " removed from new splits"); refresh("members"); }).catch(fail); break;
     case "mem-on": SB.from("members").update({ active: true }).eq("id", id).then(function (r) { if (r.error) throw r.error; refresh("members"); }).catch(fail); break;
@@ -1001,17 +1020,16 @@ document.addEventListener("input", function (ev) {
   var t = ev.target;
   if (t.id === "ex-amt") updatePreview();
   if (t.id === "py-amt") readPaymentInputs();
-  if (t.id === "ob-code") { t.value = t.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); if (S.onboard) S.onboard.code = t.value; }
-  if (t.hasAttribute && t.hasAttribute("data-su")) readOnboard();
+  if (t.id === "ob-code") { t.value = t.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); if (S.ob) S.ob.code = t.value; }
+  if (t.hasAttribute && t.hasAttribute("data-ob")) readOnboard();
 });
 document.addEventListener("change", function (ev) {
   var t = ev.target;
   if (t.id === "ex-by") updatePreview();
   if (t.id === "ex-date") { readExpenseInputs(); prefillParts(); }
-  if (t.id === "py-from" || t.id === "py-to") updatePayNote();
+  if (t.id === "py-other") { readPaymentInputs(); S.sheet.amount = ""; var a = startAmount(S.sheet); if (a) { S.sheet.amount = String(a); $("py-amt").value = a; } updatePayNote(); }
   if (t.id === "hm") { S.hm = t.value; renderMain(); }
   if (t.id === "st-me") setMe(t.value);
-  if (t.id === "su-me") readOnboard();
   if (t.id === "shot-in" && t.files && t.files[0]) {
     var s = S.sheet; if (!s) return;
     if (s.type === "expense") readExpenseInputs(); else readPaymentInputs();
@@ -1024,69 +1042,80 @@ document.addEventListener("change", function (ev) {
     });
   }
 });
-document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && S.sheet) closeSheet(); });
+function startAmount(s) {
+  var v = pairBreakdown(myId(), s.other, S.expenses, S.payments).total;
+  return s.dir === "out" ? (v < 0 ? -v : 0) : (v > 0 ? v : 0);
+}
+document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && S.sheet) closeOrBack(); });
 
 // ---------- onboarding ----------
 function readOnboard() {
-  var o = S.onboard; if (!o) return;
+  var o = S.ob; if (!o) return;
   if ($("ob-code")) o.code = $("ob-code").value;
-  if ($("su-name")) o.name = $("su-name").value;
-  o.members = o.members.map(function (n, i) { return $("su-m" + i) ? $("su-m" + i).value : n; });
-  var sel = $("su-me");
-  if (sel) { o.me = +sel.value; for (var i = 0; i < o.members.length; i++) if (sel.options[i]) sel.options[i].textContent = o.members[i] || "Name " + (i + 1); }
+  if ($("ob-name")) o.name = $("ob-name").value;
+  if ($("ob-you")) o.you = $("ob-you").value;
+  o.members = o.members.map(function (n, i) { return $("ob-m" + i) ? $("ob-m" + i).value : n; });
+}
+function joinFlat(btn) {
+  readOnboard();
+  var code = (S.ob.code || "").trim().toUpperCase(), err = $("ob-err");
+  if (!/^[A-Z0-9]{6}$/.test(code)) { err.textContent = "The code has 6 letters and numbers."; return; }
+  btn.disabled = true; btn.textContent = "Joining…";
+  SB.rpc("join_flat", { p_code: code }).then(function (r) {
+    if (r.error) throw r.error;
+    S.ob = null; openFlat(r.data);
+  }).catch(function (e) { btn.disabled = false; btn.textContent = "Join flat"; err.textContent = /No flat/.test(e.message || "") ? "No flat has that code. Check it and try again." : errText(e); });
 }
 function createFlat(btn) {
   readOnboard();
-  var o = S.onboard, err = $("su-err");
-  var names = [], meIndex = 0;
-  o.members.forEach(function (n, i) { n = n.trim().slice(0, 30); if (n) { names.push(n); if (i === o.me) meIndex = names.length; } });
-  if (names.length < 2) { err.textContent = "Add at least 2 members."; return; }
-  if (!meIndex) { err.textContent = "Pick your own name in \"Which one are you?\""; return; }
+  var o = S.ob, err = $("ob-err");
+  var you = (o.you || "").trim().slice(0, 30);
+  if (!you) { err.textContent = "Enter your name."; return; }
+  var names = [you];
+  o.members.forEach(function (n) { n = n.trim().slice(0, 30); if (n) names.push(n); });
+  if (names.length < 2) { err.textContent = "Add at least one flatmate."; return; }
   var lower = names.map(function (n) { return n.toLowerCase(); });
-  if (lower.some(function (n, i) { return lower.indexOf(n) !== i; })) { err.textContent = "Two members have the same name. Make them different."; return; }
+  if (lower.some(function (n, i) { return lower.indexOf(n) !== i; })) { err.textContent = "Two people have the same name. Make them different."; return; }
   btn.disabled = true; btn.textContent = "Creating…";
-  SB.rpc("create_flat", { p_name: (o.name || "").trim() || "Flat", p_members: names, p_me: meIndex }).then(function (r) {
+  SB.rpc("create_flat", { p_name: (o.name || "").trim() || "Flat", p_members: names, p_me: 1 }).then(function (r) {
     if (r.error) throw r.error;
-    S.onboard = null; openFlat(r.data); toast("Flat created. Share the code from Settings.");
+    S.ob = null; openFlat(r.data); toast("Flat created. Share the code from Settings.");
   }).catch(function (e) { btn.disabled = false; btn.textContent = "Create flat"; err.textContent = errText(e); });
 }
 
 // ---------- report image ----------
 function drawReport() {
   var m = S.month, R = monthData(m), t = pairs();
-  var W = 1080, P = 64, rowH = 64;
-  var H = 420 + R.rows.length * rowH + 110 + Math.max(1, t.length) * 54 + 120;
+  var W = 1080, P = 72, rowH = 76;
+  var H = 400 + R.rows.length * rowH + 120 + Math.max(1, t.length) * 58 + 110;
   var c = document.createElement("canvas"); c.width = W; c.height = H;
   var x = c.getContext("2d");
-  var disp = "Bricolage Grotesque, sans-serif", body = "Figtree, sans-serif";
-  var accent = "#3a44c9", ink = "#161a2e", muted = "#5b6178", line = "#dde0ea";
-  x.fillStyle = "#ffffff"; x.fillRect(0, 0, W, H);
-  x.fillStyle = accent; x.fillRect(0, 0, W, 14);
-  x.fillStyle = muted; x.font = "600 30px " + body; x.fillText(flatName() + " report", P, 92);
-  x.fillStyle = ink; x.font = "800 64px " + disp; x.fillText(fmtMonth(m), P, 168);
-  x.fillStyle = muted; x.font = "600 26px " + body; x.fillText("Total spent", P, 238); x.fillText("Meals", P + 420, 238); x.fillText("Expenses", P + 680, 238);
-  x.fillStyle = ink; x.font = "800 52px " + disp; x.fillText(rs(R.total), P, 298); x.fillText(String(R.meals), P + 420, 298); x.fillText(String(R.ex.length), P + 680, 298);
-  var y = 380;
-  x.fillStyle = ink; x.font = "700 32px " + disp; x.fillText("Who spent how much", P, y);
-  y += 30;
+  var f = "DM Sans, system-ui, sans-serif";
+  var accent = "#1e6b58", ink = "#1b1d1b", muted = "#74786f", line = "#e6e7e1", track = "#f0f1ec";
+  x.fillStyle = "#f5f5f2"; x.fillRect(0, 0, W, H);
+  x.fillStyle = muted; x.font = "500 30px " + f; x.fillText(flatName(), P, 104);
+  x.fillStyle = ink; x.font = "600 60px " + f; x.fillText(fmtMonth(m), P, 178);
+  x.fillStyle = muted; x.font = "500 26px " + f; x.fillText("Spent", P, 254); x.fillText("Meals", P + 420, 254); x.fillText("Entries", P + 660, 254);
+  x.fillStyle = ink; x.font = "600 46px " + f; x.fillText(rs(R.total), P, 310); x.fillText(String(R.meals), P + 420, 310); x.fillText(String(R.ex.length), P + 660, 310);
+  var y = 400;
+  x.fillStyle = ink; x.font = "600 30px " + f; x.fillText("Who paid how much", P, y);
+  y += 24;
   var max = Math.max.apply(null, R.rows.map(function (r) { return r.paid; }).concat([1]));
-  var barX = P + 200, barW = W - barX - P - 170;
   R.rows.forEach(function (r) {
-    x.fillStyle = ink; x.font = "600 28px " + body;
-    x.fillText(r.name.length > 12 ? r.name.slice(0, 11) + "…" : r.name, P, y + 38);
-    x.fillStyle = "#eef0f5"; x.fillRect(barX, y + 12, barW, 36);
-    x.fillStyle = accent; x.fillRect(barX, y + 12, Math.max(4, barW * r.paid / max), 36);
-    x.fillStyle = ink; x.font = "700 28px " + body; x.textAlign = "right"; x.fillText(rs(r.paid), W - P, y + 40); x.textAlign = "left";
+    x.fillStyle = ink; x.font = "500 28px " + f; x.fillText(r.name.length > 18 ? r.name.slice(0, 17) + "…" : r.name, P, y + 34);
+    x.textAlign = "right"; x.fillText(rs(r.paid), W - P, y + 34); x.textAlign = "left";
+    x.fillStyle = track; x.fillRect(P, y + 50, W - 2 * P, 10);
+    x.fillStyle = accent; x.fillRect(P, y + 50, Math.max(4, (W - 2 * P) * r.paid / max), 10);
     y += rowH;
   });
   y += 40; x.strokeStyle = line; x.lineWidth = 2; x.beginPath(); x.moveTo(P, y); x.lineTo(W - P, y); x.stroke();
-  y += 60; x.fillStyle = ink; x.font = "700 32px " + disp; x.fillText(t.length ? "Who owes whom" : "Everyone is settled up", P, y);
-  y += 20;
+  y += 64; x.fillStyle = ink; x.font = "600 30px " + f; x.fillText(t.length ? "Who owes whom" : "Everyone is settled up", P, y);
+  y += 12;
   t.forEach(function (d) {
-    y += 54; x.fillStyle = ink; x.font = "600 30px " + body; x.fillText(nameOf(d.from) + "  →  " + nameOf(d.to), P, y);
-    x.fillStyle = "#c3352b"; x.font = "700 30px " + body; x.textAlign = "right"; x.fillText(rs(d.amount), W - P, y); x.textAlign = "left";
+    y += 58; x.fillStyle = ink; x.font = "500 28px " + f; x.fillText(nameOf(d.from) + "  →  " + nameOf(d.to), P, y);
+    x.textAlign = "right"; x.font = "600 28px " + f; x.fillText(rs(d.amount), W - P, y); x.textAlign = "left";
   });
-  x.fillStyle = muted; x.font = "500 22px " + body; x.fillText("Made with Flat Hisaab on " + fmtDate(today()), P, H - 44);
+  x.fillStyle = muted; x.font = "400 22px " + f; x.fillText("Flat Hisaab · " + fmtDate(today()), P, H - 48);
   return c;
 }
 
@@ -1114,7 +1143,8 @@ document.addEventListener("visibilitychange", function () {
 });
 if (Cap.App) {
   Cap.App.addListener("backButton", function () {
-    if (S.sheet) closeSheet();
+    if (S.sheet) closeOrBack();
+    else if (S.view === "onboard" && S.ob && S.ob.step !== "choose") { S.ob.step = "choose"; renderMain(); }
     else if (S.view === "app" && S.tab !== "home") setTab("home");
     else Cap.App.exitApp();
   });

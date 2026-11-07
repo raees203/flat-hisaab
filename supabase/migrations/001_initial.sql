@@ -1,4 +1,4 @@
--- Flat Hisaab — Supabase schema
+-- 001 — Flat Hisaab initial schema (as applied to the live project on 2026-11-07)
 -- Every rule that matters is enforced here on the server, not just in the app:
 --   * only people who joined a flat (with its code) can see or change its data
 --   * a payment can only be approved/rejected by the person who received it
@@ -78,8 +78,14 @@ create table public.attendance (
 create index on public.flat_users (user_id);
 create index on public.members (flat_id);
 create index on public.expenses (flat_id, date);
+create index on public.expenses (paid_by);
+create index on public.expenses (created_by_member);
 create index on public.payments (flat_id, date);
+create index on public.payments (from_member);
+create index on public.payments (to_member);
+create index on public.payments (created_by_member);
 create index on public.attendance (flat_id, date);
+create index on public.attendance (member_id);
 
 -- ---------- helper functions ----------
 create or replace function public.is_flat_member(f uuid) returns boolean
@@ -325,6 +331,16 @@ revoke all on function public.create_flat(text, text[], int) from public, anon;
 revoke all on function public.join_flat(text) from public, anon;
 revoke all on function public.claim_member(uuid) from public, anon;
 revoke all on function public.unlink_member(uuid) from public, anon;
+revoke all on function public.new_flat_code() from public, anon, authenticated;
+revoke all on function public.is_flat_member(uuid) from public, anon;
+revoke all on function public.is_flat_owner(uuid) from public, anon;
+revoke all on function public.my_member_id(uuid) from public, anon;
+revoke all on function public.member_in_flat(uuid, uuid) from public, anon;
+grant execute on function public.is_flat_member(uuid) to authenticated;
+grant execute on function public.is_flat_owner(uuid) to authenticated;
+grant execute on function public.my_member_id(uuid) to authenticated;
+grant execute on function public.member_in_flat(uuid, uuid) to authenticated;
+revoke all on all tables in schema public from anon;
 grant execute on function public.create_flat(text, text[], int) to authenticated;
 grant execute on function public.join_flat(text) to authenticated;
 grant execute on function public.claim_member(uuid) to authenticated;

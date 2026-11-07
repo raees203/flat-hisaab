@@ -81,6 +81,33 @@ function personSummary(id, pairs) {
   return { receive: receive, pay: pay, toReceive: sum(receive), toPay: sum(pay) };
 }
 
+// Everything that makes up the balance between `me` and `other`, item by item.
+// amount > 0: this item means `other` owes me more; amount < 0: I owe `other` more.
+// The items always add up to exactly the pairwise balance shown on the home screen.
+function pairBreakdown(me, other, expenses, payments) {
+  var items = [];
+  expenses.forEach(function (e) {
+    var sh = e.shares || {};
+    if (e.paidBy === me && sh[other]) {
+      items.push({ kind: "expense", id: e.id, date: e.date, createdAt: e.createdAt || 0, note: e.note, meal: e.meal,
+        paidBy: me, total: Number(e.amount) || 0, share: Number(sh[other]) || 0, amount: Number(sh[other]) || 0 });
+    } else if (e.paidBy === other && sh[me]) {
+      items.push({ kind: "expense", id: e.id, date: e.date, createdAt: e.createdAt || 0, note: e.note, meal: e.meal,
+        paidBy: other, total: Number(e.amount) || 0, share: Number(sh[me]) || 0, amount: -(Number(sh[me]) || 0) });
+    }
+  });
+  payments.forEach(function (p) {
+    var involved = (p.from === other && p.to === me) || (p.from === me && p.to === other);
+    if (!involved) return;
+    var a = Number(p.amount) || 0;
+    items.push({ kind: "payment", id: p.id, date: p.date, createdAt: p.createdAt || 0, from: p.from, to: p.to, method: p.method,
+      status: p.status || "approved", counted: isCounted(p), amount: isCounted(p) ? (p.from === other ? -a : a) : 0, paid: a });
+  });
+  items.sort(function (x, y) { return x.date < y.date ? -1 : x.date > y.date ? 1 : x.createdAt - y.createdAt; });
+  var total = items.reduce(function (s, it) { return s + it.amount; }, 0);
+  return { items: items, total: total };
+}
+
 // Per-member totals for a set of expenses/payments (e.g. one month).
 function memberTotals(memberIds, expenses, payments) {
   var t = {};
@@ -100,5 +127,5 @@ function memberTotals(memberIds, expenses, payments) {
 
 if (typeof module !== "undefined") {
   module.exports = { splitAmount: splitAmount, isCounted: isCounted, computeBalances: computeBalances,
-    pairwiseDebts: pairwiseDebts, personSummary: personSummary, memberTotals: memberTotals };
+    pairwiseDebts: pairwiseDebts, personSummary: personSummary, pairBreakdown: pairBreakdown, memberTotals: memberTotals };
 }

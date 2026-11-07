@@ -82,4 +82,39 @@ for (let run = 0; run < 3000; run++) {
   const after = L.computeBalances(ids, exps, pays.concat(pr.map((p) => ({ ...p, status: "approved" }))));
   assert.ok(Object.values(after).every((x) => x === 0));
 }
-console.log("all tests passed (incl. 3000 random flats)");
+// --- breakdown: the example from the flat (Ali owes me 1000 = 500 roti + 500 chicken) ---
+{
+  const ex = [
+    { id: "e1", paidBy: "me", amount: 1500, date: "2026-11-05", note: "roti", shares: { me: 500, ali: 500, zain: 500 } },
+    { id: "e2", paidBy: "me", amount: 1000, date: "2026-11-06", note: "chicken", shares: { me: 500, ali: 500 } },
+  ];
+  const b = L.pairBreakdown("me", "ali", ex, []);
+  assert.deepStrictEqual(b.items.map((i) => [i.note, i.amount]), [["roti", 500], ["chicken", 500]]);
+  assert.strictEqual(b.total, 1000);
+  const b2 = L.pairBreakdown("ali", "me", ex, [{ id: "p", from: "ali", to: "me", amount: 300, date: "2026-11-07", status: "pending" }]);
+  assert.strictEqual(b2.total, -1000, "pending payment shown but not counted");
+  assert.strictEqual(b2.items[2].kind, "payment"); assert.strictEqual(b2.items[2].amount, 0);
+}
+// --- breakdown always matches the pairwise balance, for every pair, in random flats ---
+seed = 999;
+for (let run = 0; run < 1500; run++) {
+  const n = ri(2, 7);
+  const ids = Array.from({ length: n }, (_, i) => "m" + i);
+  const exps = [], pays = [];
+  for (let k = ri(1, 20); k > 0; k--) {
+    const parts = ids.filter(() => rnd() < 0.6); if (!parts.length) parts.push(ids[0]);
+    const payer = ids[ri(0, n - 1)], amount = ri(1, 9000);
+    exps.push({ id: "e" + k, paidBy: payer, amount, date: "2026-11-" + String(ri(1, 28)).padStart(2, "0"), shares: L.splitAmount(amount, parts, payer) });
+  }
+  for (let k = ri(0, 5); k > 0; k--) {
+    const a = ids[ri(0, n - 1)], b = ids[ri(0, n - 1)]; if (a === b) continue;
+    pays.push({ id: "p" + k, from: a, to: b, amount: ri(1, 5000), date: "2026-11-15", status: ["approved", "pending", "rejected"][ri(0, 2)] });
+  }
+  const pr = L.pairwiseDebts(exps, pays);
+  for (const a of ids) for (const b of ids) {
+    if (a === b) continue;
+    const owed = (pr.find((p) => p.from === b && p.to === a) || { amount: 0 }).amount - (pr.find((p) => p.from === a && p.to === b) || { amount: 0 }).amount;
+    assert.strictEqual(L.pairBreakdown(a, b, exps, pays).total, owed, "breakdown must equal balance");
+  }
+}
+console.log("all tests passed (incl. 3000 random flats + 1500 breakdown flats)");
