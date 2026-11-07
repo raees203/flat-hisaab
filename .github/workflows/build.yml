@@ -1,4 +1,4 @@
-name: Build APK
+name: Build app (APK + web)
 
 on:
   push:
@@ -9,6 +9,31 @@ permissions:
   contents: write
 
 jobs:
+  # Web version (for iPhone / any browser), published on GitHub Pages
+  web:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node src/test.js
+      - run: python3 build.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
   build:
     runs-on: ubuntu-latest
     steps:

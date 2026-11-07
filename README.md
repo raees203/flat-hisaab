@@ -4,8 +4,10 @@ Android app for flatmates to split daily food costs: who paid, who ate, who owes
 
 - **App**: `src/` (HTML/JS), packaged with Capacitor into `android/`
 - **Backend**: Supabase (free plan). Schema and all security rules: `supabase/schema.sql`
-- **APK**: built by GitHub Actions on every push to `main` (`.github/workflows/build-apk.yml`).
+- **APK** (Android): built by GitHub Actions on every push to `main` (`.github/workflows/build.yml`).
   Download it from the latest Release, or from the `apk` branch.
+- **Web app** (iPhone / any browser): the same app, published to GitHub Pages at
+  https://raees203.github.io/flat-hisaab/ — on iPhone open it in Safari, then Share → Add to Home Screen.
 
 ## How the rules are enforced (server side)
 - Only phones that joined a flat with its 6-letter code can read or write that flat.
