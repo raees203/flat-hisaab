@@ -76,6 +76,22 @@ function makeClient(phone) {
         const ownerOf = (f) => (db.flats.find((x) => x.id === f) || {}).owner_id === u;
         if (t === "flats") rows = rows.filter((r) => r.owner_id === u);
         if (t === "payments") rows = rows.filter((r) => (memberOf(r.to_member) || {}).user_id === u);
+        if (t === "expenses") {
+          const myMem = (f) => (db.members.find((m) => m.flat_id === f && m.user_id === u) || {}).id;
+          for (const r of rows) {
+            const keys = Object.keys(this.p);
+            if (keys.some((k) => !["disputed_by", "dispute_note"].includes(k))) return err("An expense can't be edited. Delete it and add it again.");
+            if (!r.disputed_by && this.p.disputed_by) {
+              if (this.p.disputed_by !== myMem(r.flat_id)) return err("You can only report as yourself");
+              if (!(this.p.disputed_by in r.shares)) return err("Only people who are part of this expense can report it");
+              if (r.created_by === u) return err("You added this expense, so you can delete it instead");
+              r.disputed_at = now();
+            } else if (r.disputed_by && this.p.disputed_by === null) {
+              if (!(r.created_by === u || r.disputed_by === myMem(r.flat_id))) return err("Only the person who added it or who reported it can clear this");
+              r.disputed_at = null;
+            } else return err("This expense has already been reported");
+          }
+        }
         for (const r of rows) {
           if (t === "members" && ("name" in this.p || "active" in this.p) && !(ownerOf(r.flat_id) || r.user_id === u)) return err("Only the flat owner or that person can change this");
           if (t === "payments") {
@@ -89,7 +105,9 @@ function makeClient(phone) {
       }
       if (this.op === "delete") {
         const rows = this.rows().filter((r) => {
-          if (t === "expenses") return r.created_by === u;
+          const owner = (db.flats.find((f) => f.id === r.flat_id) || {}).owner_id === u;
+          const myMem = (db.members.find((m) => m.flat_id === r.flat_id && m.user_id === u) || {}).id;
+          if (t === "expenses") return r.created_by === u || (owner && r.disputed_by && r.disputed_by !== myMem);
           if (t === "payments") return r.status !== "approved" && r.created_by === u;
           return false;
         });

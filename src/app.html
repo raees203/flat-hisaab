@@ -61,7 +61,7 @@ var MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July
 var CFG = window.HISAAB_CONFIG || {};
 var Cap = (window.Capacitor && window.Capacitor.Plugins) || {};
 var CHEV = '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>';
-var MARK = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M6 3h12v16.5l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3z"/><path d="M9 8h6M9 11.5h6M9 15h3.5" stroke="#1e6b58" stroke-width="1.6" stroke-linecap="round"/></svg>';
+var MARK = '<svg viewBox="0 0 24 24"><path d="M11.52 12.48 L18.29 14.94 A7.20 7.20 0 1 1 12.77 5.39 Z" fill="#f7f1e6"/><path d="M12.52 11.90 L13.77 4.81 A7.20 7.20 0 0 1 19.28 14.37 Z" fill="#f2be5c"/></svg>';
 
 function pad(n) { return (n < 10 ? "0" : "") + n; }
 function dstr(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
@@ -126,7 +126,10 @@ function payerChoices() {
   return list;
 }
 function canMarkAttendance(mid) { return mid === myId() || isOwner(); }
-function canDeleteExpense(e) { return e.createdByUid === S.uid; }
+function canDeleteExpense(e) { return e.createdByUid === S.uid || (isOwner() && !!e.disputedBy && e.disputedBy !== myId()); }
+function canReport(e) { var me = myId(); return !!me && !e.disputedBy && e.createdByUid !== S.uid && !!(e.shares && me in e.shares); }
+function canClearReport(e) { return !!e.disputedBy && (e.createdByUid === S.uid || e.disputedBy === myId()); }
+function myReviews() { return S.expenses.filter(function (e) { return e.disputedBy && e.createdByUid === S.uid; }).sort(function (a, b) { return b.disputedAt - a.disputedAt; }); }
 function canDeletePayment(p) { return p.createdByUid === S.uid && p.status !== "approved"; }
 function canEditMember(m) { return isOwner() || (m && m.uid === S.uid); }
 
@@ -148,7 +151,8 @@ function fail(e) { toast(errText(e)); }
 function mapMember(r) { return { id: r.id, name: r.name, uid: r.user_id, active: r.active, createdAt: Date.parse(r.created_at) }; }
 function mapExpense(r) {
   return { id: r.id, amount: r.amount, paidBy: r.paid_by, date: r.date, meal: r.meal, note: r.note, shares: r.shares || {},
-    receipt: !!r.receipt_path, receiptPath: r.receipt_path, createdAt: Date.parse(r.created_at), by: r.created_by_member, createdByUid: r.created_by };
+    receipt: !!r.receipt_path, receiptPath: r.receipt_path, createdAt: Date.parse(r.created_at), by: r.created_by_member, createdByUid: r.created_by,
+    disputedBy: r.disputed_by || null, disputeNote: r.dispute_note || "", disputedAt: r.disputed_at ? Date.parse(r.disputed_at) : 0 };
 }
 function mapPayment(r) {
   return { id: r.id, from: r.from_member, to: r.to_member, amount: r.amount, method: r.method, date: r.date, status: r.status,
@@ -171,7 +175,7 @@ function fetchAll(table, order) {
 var loaders = {
   flat: function () { return SB.from("flats").select("*").eq("id", S.flatId).maybeSingle().then(function (r) { if (r.error) throw r.error; S.flat = r.data; }); },
   members: function () { return fetchAll("members", "created_at").then(function (rows) { S.members = rows.map(mapMember); }); },
-  expenses: function () { return fetchAll("expenses", "created_at").then(function (rows) { S.expenses = rows.map(mapExpense).sort(sortEntries); }); },
+  expenses: function () { return fetchAll("expenses", "created_at").then(function (rows) { S.expenses = rows.map(mapExpense).sort(sortEntries); notifyNewReports(); }); },
   payments: function () { return fetchAll("payments", "created_at").then(function (rows) { S.payments = rows.map(mapPayment).sort(sortEntries); notifyNewPending(); }); },
   attendance: function () {
     var date = S.attDate;
@@ -253,6 +257,21 @@ function notifyNewPending() {
   toast(body);
   if (Cap.LocalNotifications && document.visibilityState !== "visible") {
     Cap.LocalNotifications.schedule({ notifications: [{ id: Math.floor(Math.random() * 2000000000), title: "Payment to approve", body: body }] }).catch(function () {});
+  }
+}
+
+var seenReports = {};
+try { seenReports = JSON.parse(lsGet("hisaab.seenReports") || "{}") || {}; } catch (e) { seenReports = {}; }
+function notifyNewReports() {
+  var fresh = myReviews().filter(function (e) { return !seenReports[e.id + ":" + e.disputedAt]; });
+  if (!fresh.length) return;
+  fresh.forEach(function (e) { seenReports[e.id + ":" + e.disputedAt] = 1; });
+  lsSet("hisaab.seenReports", JSON.stringify(seenReports));
+  var e = fresh[0];
+  var body = nameOf(e.disputedBy) + " says “" + itemTitle(e) + "” (" + rs(e.amount) + ") is wrong.";
+  toast(body);
+  if (Cap.LocalNotifications && document.visibilityState !== "visible") {
+    Cap.LocalNotifications.schedule({ notifications: [{ id: Math.floor(Math.random() * 2000000000), title: "Expense reported as wrong", body: body }] }).catch(function () {});
   }
 }
 
@@ -364,7 +383,7 @@ function renderHeader() {
   $("flatName").textContent = S.flat ? S.flat.name : "Flat Hisaab";
   var me = myId();
   $("meLine").textContent = me ? "You're " + nameOf(me) : (inApp ? "Pick your name below" : "");
-  var n = inApp ? myApprovals().length : 0;
+  var n = inApp ? myApprovals().length + myReviews().length : 0;
   $("bellBadge").hidden = !n; $("bellBadge").textContent = n; $("tabDot").hidden = !n;
   $("bell").hidden = !inApp;
 }
@@ -441,10 +460,18 @@ function approvalsList(list) {
       '<button class="btn sm" data-act="reject" data-id="' + esc(p.id) + '">Reject</button><button class="btn sm primary" data-act="approve" data-id="' + esc(p.id) + '">Approve</button></span></div>';
   }).join("");
 }
+function reviewsList(list) {
+  return list.map(function (e) {
+    return '<div class="row"><span class="main"><span class="t">' + esc(nameOf(e.disputedBy)) + " says “" + esc(itemTitle(e)) + "” is wrong</span>" +
+      '<div class="s">' + rs(e.amount) + " · " + fmtDate(e.date) + (e.disputeNote ? " · “" + esc(e.disputeNote) + "”" : "") + "</div></span>" +
+      '<span class="end"><button class="btn sm" data-act="open-expense" data-id="' + esc(e.id) + '">View</button><button class="btn sm" data-act="clear-report" data-id="' + esc(e.id) + '">It\'s correct</button>' +
+      '<button class="btn sm danger" data-act="quick-delete" data-id="' + esc(e.id) + '">Delete</button></span></div>';
+  }).join("");
+}
 function renderHome() {
   var me = myId(), h = '<div class="stack">';
-  var ap = myApprovals();
-  if (ap.length) h += '<div class="section-h"><h2>Waiting for your approval</h2></div><div class="card flush"><div class="list">' + approvalsList(ap) + "</div></div>";
+  var ap = myApprovals(), rv = myReviews();
+  if (ap.length || rv.length) h += '<div class="section-h"><h2>Needs your attention</h2></div><div class="card flush"><div class="list">' + approvalsList(ap) + reviewsList(rv) + "</div></div>";
   if (me) {
     var sm = personSummary(me, pairs());
     var waiting = S.payments.filter(function (p) { return p.status === "pending" && p.from === me; }).reduce(function (a, p) { return a + p.amount; }, 0);
@@ -480,7 +507,7 @@ function entryRow(e) {
   }
   var n = Object.keys(e.shares || {}).length;
   return '<button class="row" data-act="open-expense" data-id="' + esc(e.id) + '"><span class="avatar">' + initials(nameOf(e.paidBy)) + '</span><span class="main"><span class="t">' +
-    esc(itemTitle(e)) + '</span><div class="s">' + esc(nameOf(e.paidBy)) + " paid · " + people(n) + " · " + fmtDate(e.date) + '</div></span><span class="end"><span class="amt num">' + rs(e.amount) + "</span></span></button>";
+    esc(itemTitle(e)) + (e.disputedBy ? ' <span class="pill wait">Reported</span>' : "") + '</span><div class="s">' + esc(nameOf(e.paidBy)) + " paid · " + people(n) + " · " + fmtDate(e.date) + '</div></span><span class="end"><span class="amt num">' + rs(e.amount) + "</span></span></button>";
 }
 
 // --- today ---
@@ -595,7 +622,7 @@ function renderSheet() {
   else if (s.type === "exp-detail") html = sheetWrap("Expense", expenseDetail(s));
   else if (s.type === "pay-detail") html = sheetWrap("Payment", paymentDetail(s));
   else if (s.type === "list") html = sheetWrap(s.v === "receive" ? "You'll get" : "You owe", listBody(s.v));
-  else if (s.type === "approvals") html = sheetWrap("Approvals", approvalsSheet());
+  else if (s.type === "approvals") html = sheetWrap("Needs your attention", approvalsSheet());
   else if (s.type === "settings") html = sheetWrap("Settings", settingsBody());
   else if (s.type === "image") html = sheetWrap("Report image", '<p class="small muted" style="margin-bottom:12px">Long-press the image to save or share it.</p><img class="receipt-img" src="' + s.src + '" alt="Report">');
   else if (s.type === "copy") html = sheetWrap("Copy", '<p class="small muted" style="margin-bottom:12px">Select the text and copy it.</p><textarea class="input copybox" id="copybox" readonly>' + esc(s.text) + "</textarea>");
@@ -643,9 +670,9 @@ function listBody(v) {
   }).join("") + '<div class="row"><span class="main t">Total</span><span class="end amt num ' + (v === "receive" ? "good-t" : "bad-t") + '">' + rs(v === "receive" ? sm.toReceive : sm.toPay) + "</span></div></div></div></div>";
 }
 function approvalsSheet() {
-  var me = myId(), list = myApprovals();
+  var me = myId(), list = myApprovals(), rv = myReviews();
   var waiting = S.payments.filter(function (p) { return p.status === "pending" && me && p.from === me; });
-  var h = list.length ? '<div class="card flush"><div class="list">' + approvalsList(list) + "</div></div>" : '<div class="empty">Nothing to approve right now.</div>';
+  var h = (list.length || rv.length) ? '<div class="card flush"><div class="list">' + approvalsList(list) + reviewsList(rv) + "</div></div>" : '<div class="empty">Nothing needs your attention right now.</div>';
   if (waiting.length) h += '<div class="section-h"><h2>Your payments waiting</h2></div><div class="card flush"><div class="list">' + waiting.map(function (p) { return entryRow(Object.assign({ _pay: 1 }, p)); }).join("") + "</div></div>";
   return '<div class="stack">' + h + "</div>";
 }
@@ -811,7 +838,22 @@ function expenseDetail(s) {
     ids.map(function (id) { return '<div class="row"><span class="main">' + esc(nameOf(id)) + (id === e.paidBy ? ' <span class="muted small">· paid</span>' : "") + '</span><span class="end amt num">' + rs(sh[id]) + "</span></div>"; }).join("") +
     '<div class="row"><span class="main t">Total</span><span class="end amt num">' + rs(total) + "</span></div></div></div>" +
     (excl.length ? '<p class="small muted" style="margin:0 2px">Not included: ' + esc(excl.join(", ")) + "</p>" : "") +
-    (e.receipt ? receiptBlock(s) : "") + deleteBlock(s, canDeleteExpense(e)) + "</div>";
+    (e.receipt ? receiptBlock(s) : "") + reportBlock(s, e) + deleteBlock(s, canDeleteExpense(e)) + "</div>";
+}
+function reportBlock(s, e) {
+  var h = "";
+  if (e.disputedBy) {
+    h += '<div class="note warn"><b style="color:var(--wait)">Reported as wrong</b> by ' + esc(nameOf(e.disputedBy)) + (e.disputeNote ? ": “" + esc(e.disputeNote) + "”" : "") +
+      '<div class="tiny muted" style="margin-top:4px">' + (e.createdByUid === S.uid ? "If it's wrong, delete it and add the right one. If it's fine, tell him it's correct." :
+        "It still counts until " + esc(nameOf(e.by || e.paidBy)) + " deletes it" + (isOwner() ? " or you remove it as the flat owner." : ".")) + "</div></div>";
+    if (canClearReport(e)) h += '<button class="btn block" data-act="clear-report" data-id="' + esc(e.id) + '">' + (e.createdByUid === S.uid ? "It's correct" : "Withdraw my report") + "</button>";
+    return h;
+  }
+  if (!canReport(e)) return "";
+  if (!s.reporting) return '<button class="btn block" data-act="report-open">Report as wrong</button>';
+  return '<div class="card stack tight"><div class="field"><label for="rep-note">What\'s wrong? <span class="muted" style="font-weight:400">(optional)</span></label><input class="input" id="rep-note" maxlength="100" placeholder="I didn\'t eat, amount is wrong…"></div>' +
+    '<p class="tiny muted">' + esc(nameOf(e.by || e.paidBy)) + " will be asked to delete it or confirm it's correct.</p>" +
+    '<div class="btnrow"><button class="btn" data-act="report-cancel">Cancel</button><button class="btn primary" data-act="report-send" data-id="' + esc(e.id) + '">Send report</button></div></div>';
 }
 function paymentDetail(s) {
   var p = findById(S.payments, s.id);
@@ -982,6 +1024,25 @@ document.addEventListener("click", function (ev) {
       }).catch(function () { s.imgLoading = false; s.imgMissing = true; renderSheet(); });
       break;
     }
+    case "report-open": s.reporting = true; renderSheet(); if ($("rep-note")) $("rep-note").focus(); break;
+    case "report-cancel": s.reporting = false; renderSheet(); break;
+    case "report-send": {
+      var note = ($("rep-note").value || "").trim().slice(0, 100);
+      SB.from("expenses").update({ disputed_by: myId(), dispute_note: note || null }).eq("id", id).select("id").then(function (r) {
+        if (r.error) throw r.error;
+        if (!r.data || !r.data.length) throw new Error("Couldn't report this expense.");
+        s.reporting = false; toast("Reported. " + nameOf(findById(S.expenses, id).by || findById(S.expenses, id).paidBy) + " will see it."); refresh("expenses");
+      }).catch(fail);
+      break;
+    }
+    case "clear-report":
+      SB.from("expenses").update({ disputed_by: null, dispute_note: null }).eq("id", id).select("id").then(function (r) {
+        if (r.error) throw r.error;
+        if (!r.data || !r.data.length) throw new Error("Couldn't update this expense.");
+        toast("Marked as correct"); refresh("expenses");
+      }).catch(fail);
+      break;
+    case "quick-delete": openSheet({ type: "exp-detail", id: id, confirm: true }); break;
     case "del-ask": s.confirm = true; renderSheet(); break;
     case "del-no": s.confirm = false; renderSheet(); break;
     case "del-yes": {

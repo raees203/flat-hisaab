@@ -117,4 +117,44 @@ delete from public.expenses where id = :'sexp';
 select public.t_ok((select count(*) from public.expenses where id = :'sexp') = 0, 'Sohaib deletes his own expense');
 delete from storage.objects where name = :'fid' || '/sohaib.jpg';
 select public.t_ok((select count(*) from storage.objects) = 0, 'Sohaib deletes his own screenshot');
+
+-- ===== 003: report a wrong expense =====
+select id as zain from public.members where name = 'Zain' \gset
+select set_config('request.jwt.claim.sub', :'B', false);
+insert into public.expenses (flat_id, amount, paid_by, date, meal, note, shares)
+  values (:'fid', 900, :'sohaib', current_date, 'other', 'wrong1', jsonb_build_object(:'sohaib', 300, :'raees', 300, :'zain', 300));
+insert into public.expenses (flat_id, amount, paid_by, date, meal, note, shares)
+  values (:'fid', 600, :'sohaib', current_date, 'other', 'wrong2', jsonb_build_object(:'sohaib', 300, :'raees', 300));
+insert into public.expenses (flat_id, amount, paid_by, date, meal, note, shares)
+  values (:'fid', 600, :'sohaib', current_date, 'other', 'wrong3', jsonb_build_object(:'sohaib', 300, :'zain', 300));
+select id as w1 from public.expenses where note = 'wrong1' \gset
+select id as w2 from public.expenses where note = 'wrong2' \gset
+select id as w3 from public.expenses where note = 'wrong3' \gset
+select public.t_block(format('update public.expenses set disputed_by = %L where id = %L', :'sohaib', :'w1'), 'Sohaib reports his own expense (should just delete it)');
+
+select set_config('request.jwt.claim.sub', :'C', false);
+select public.t_block(format('update public.expenses set disputed_by = %L where id = %L', :'sohaib', :'w1'), 'Zain reports in Sohaib''s name');
+select public.t_block(format('update public.expenses set disputed_by = %L where id = %L', :'zain', :'w2'), 'Zain reports an expense he is not part of');
+update public.expenses set disputed_by = :'zain', dispute_note = 'I was not there' where id = :'w1';
+select public.t_ok((select disputed_at is not null and dispute_note = 'I was not there' from public.expenses where id = :'w1'), 'Zain reports wrong1 with a note');
+select public.t_block(format('update public.expenses set amount = 1 where id = %L', :'w1'), 'Zain changes the amount');
+select public.t_noop(format('delete from public.expenses where id = %L', :'w1'), 'Zain deletes a reported expense he did not add');
+update public.expenses set disputed_by = :'zain' where id = :'w3';
+
+select set_config('request.jwt.claim.sub', :'R', false);
+select public.t_block(format('update public.expenses set disputed_by = %L where id = %L', :'raees', :'w1'), 'Raees reports wrong1 again (already reported)');
+select public.t_block(format('update public.expenses set disputed_by = null where id = %L', :'w3'), 'owner clears someone else''s report on someone else''s expense');
+delete from public.expenses where id = :'w1';
+select public.t_ok((select count(*) from public.expenses where id = :'w1') = 0, 'owner removes an expense Zain reported');
+update public.expenses set disputed_by = :'raees' where id = :'w2';
+select public.t_noop(format('delete from public.expenses where id = %L', :'w2'), 'owner can''t remove an expense only he reported');
+
+select set_config('request.jwt.claim.sub', :'B', false);
+update public.expenses set disputed_by = null where id = :'w2';
+select public.t_ok((select disputed_by is null and dispute_note is null from public.expenses where id = :'w2'), 'Sohaib (who added it) marks it correct');
+select set_config('request.jwt.claim.sub', :'C', false);
+update public.expenses set disputed_by = null where id = :'w3';
+select public.t_ok((select disputed_by is null from public.expenses where id = :'w3'), 'Zain withdraws his own report');
+select set_config('request.jwt.claim.sub', :'X', false);
+select public.t_noop(format('update public.expenses set disputed_by = null where id = %L', :'w2'), 'outsider touches an expense');
 \echo ALL RULE TESTS PASSED

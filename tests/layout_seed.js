@@ -17,6 +17,8 @@
   ex("e3", "m0", 1000, 1, "dinner", "Vegetables", ["m0", "m2"]);
   ex("e4", "m3", 650, 0, "nashta", "Doodh, anday, paratha", ["m0", "m1", "m3"]);
   ex("e5", "m2", 3200, 0, "other", "Gas cylinder refill", ["m0", "m1", "m2", "m3", "m4"]);
+  var e1 = db.expenses.find(function (e) { return e.id === "e1"; });
+  e1.disputed_by = "m1"; e1.dispute_note = "I only had half"; e1.disputed_at = new Date().toISOString();
   db.payments.push({ id: "p1", flat_id: "f1", from_member: "m1", to_member: "m0", amount: 500, method: "JazzCash", date: d(0), status: "pending", created_by: "s-uid", created_by_member: "m1", created_at: new Date().toISOString() });
   db.payments.push({ id: "p2", flat_id: "f1", from_member: "m3", to_member: "m0", amount: 300, method: "Cash", date: d(1), status: "approved", created_by: me, created_by_member: "m0", created_at: new Date().toISOString() });
   var client = M.makeClient("raees");

@@ -123,6 +123,29 @@ const mid = (n) => db.members.find((m) => m.name === n).id;
   ok(!raees.q('[data-act="del-ask"]'), "even the owner can't delete Sohaib's expense");
   raees.click('[data-act="close-all"]');
 
+  // ---- report a wrong expense ----
+  zain.click('[data-act="close-all"]');
+  zain.click(`[data-act="open-expense"][data-id="${roti.id}"]`); await tick(50);
+  ok(!!zain.q('[data-act="report-open"]'), "Zain (in the Roti expense) sees Report as wrong");
+  zain.click('[data-act="report-open"]'); await tick(50);
+  zain.set("rep-note", "I didn't eat lunch"); zain.click('[data-act="report-send"]'); await tick(700);
+  ok(db.expenses.find((e) => e.id === roti.id).disputed_by === mid("Zain"), "report saved");
+  sohaib.click('[data-tab="home"]'); await tick(200);
+  ok(/Zain says “Roti” is wrong/.test(sohaib.main()) && sohaib.d.getElementById("bellBadge").textContent === "1", "Sohaib (who added it) sees the report + bell");
+  ok(/Zain says “Roti”/.test(sohaib.toast()), "Sohaib got an alert: " + sohaib.toast());
+  raees.click('[data-tab="history"]'); await tick(200);
+  raees.click(`[data-act="open-expense"][data-id="${roti.id}"]`); await tick(50);
+  ok(!!raees.q('[data-act="del-ask"]') && /Reported as wrong/.test(raees.sheet()), "owner can now remove the reported expense");
+  raees.click('[data-act="close-all"]');
+  sohaib.click(`[data-act="clear-report"][data-id="${roti.id}"]`); await tick(700);
+  ok(!db.expenses.find((e) => e.id === roti.id).disputed_by, "Sohaib marks it correct, report cleared");
+  zain.click('[data-act="close-all"]'); zain.click(`[data-act="open-expense"][data-id="${roti.id}"]`); await tick(50);
+  zain.click('[data-act="report-open"]'); await tick(50); zain.click('[data-act="report-send"]'); await tick(700);
+  sohaib.click(`[data-act="quick-delete"][data-id="${roti.id}"]`); await tick(50);
+  sohaib.click('[data-act="del-yes"]'); await tick(700);
+  ok(!db.expenses.find((e) => e.id === roti.id), "after a second report Sohaib deletes it in two taps");
+  zain.click('[data-act="close-all"]');
+
   // ---- settings: only owner manages others ----
   sohaib.click('[data-act="open-settings"]'); await tick(50);
   ok(!sohaib.q(`#mn-${mid("Raees")}`) && !!sohaib.q(`#mn-${mid("Sohaib")}`) && !sohaib.q('[data-act="mem-add"]') && !sohaib.q("#st-name"), "Sohaib can only rename himself");
@@ -133,7 +156,7 @@ const mid = (n) => db.members.find((m) => m.name === n).id;
 
   // ---- report ----
   raees.click('[data-tab="report"]'); await tick(100);
-  ok(/Rs 1,600/.test(raees.main()), "report total Rs 1,600");
+  ok(/Rs 600/.test(raees.main()) && !/Rs 1,600/.test(raees.main()), "report total updated after delete (Rs 600)");
 
   const errs = [...raees.errors, ...sohaib.errors, ...zain.errors];
   ok(errs.length === 0, "no script errors " + JSON.stringify(errs));
