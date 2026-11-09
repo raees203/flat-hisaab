@@ -157,4 +157,66 @@ update public.expenses set disputed_by = null where id = :'w3';
 select public.t_ok((select disputed_by is null from public.expenses where id = :'w3'), 'Zain withdraws his own report');
 select set_config('request.jwt.claim.sub', :'X', false);
 select public.t_noop(format('update public.expenses set disputed_by = null where id = %L', :'w2'), 'outsider touches an expense');
+
+-- ===== 004: payment accounts =====
+select set_config('request.jwt.claim.sub', :'B', false);
+insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (:'fid', :'sohaib', 'easypaisa', '  Sohaib   Khan ', '+92 300 1234567');
+select id as acc1 from public.payment_accounts where kind = 'easypaisa' and member_id = :'sohaib' \gset
+select public.t_ok((select number = '03001234567' and title = 'Sohaib Khan' from public.payment_accounts where id = :'acc1'), 'Sohaib adds Easypaisa; +92 number and spaces are tidied');
+select public.t_ok((select is_primary from public.payment_accounts where id = :'acc1'), 'his first account becomes the preferred one');
+insert into public.payment_accounts (flat_id, member_id, kind, provider, title, number) values (:'fid', :'sohaib', 'bank', 'Meezan Bank', 'Sohaib Khan', 'pk23 mezn 0001 0201 0456 7890');
+select id as acc2 from public.payment_accounts where kind = 'bank' and member_id = :'sohaib' \gset
+select public.t_ok((select number = 'PK23MEZN0001020104567890' and not is_primary from public.payment_accounts where id = :'acc2'), 'Sohaib adds a Meezan IBAN (checksum ok, tidied)');
+insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (:'fid', :'sohaib', 'jazzcash', 'Sohaib Khan', '03001234567');
+select public.t_ok(true, 'same mobile number can be both Easypaisa and JazzCash');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'easypaisa', 'Sohaib', '03001234567'), 'the same Easypaisa number twice');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'raees', 'jazzcash', 'Sohaib Khan', '03111111111'), 'Sohaib adds an account under Raees''s name');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'ali', 'jazzcash', 'Sohaib Khan', '03111111111'), 'Sohaib adds an account for Ali (no phone)');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'easypaisa', 'Sohaib', '0300123'), 'a mobile number that is too short');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'jazzcash', 'Sohaib', '04212345678'), 'a landline as a JazzCash number');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, provider, title, number) values (%L, %L, %L, %L, %L, %L)', :'fid', :'sohaib', 'bank', 'Standard Chartered', 'Sohaib', 'PK36SCBL0000001123456703'), 'an IBAN with one wrong digit');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'bank', 'Sohaib', '01234567890'), 'a bank account without the bank');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'other', 'Sohaib', '03001234567'), 'an "other" account without saying which app');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'easypaisa', 'S', '03007654321'), 'a one-letter account title');
+
+-- preferred: switching moves it; it can't simply be removed
+select updated_at as acc1_upd from public.payment_accounts where id = :'acc1' \gset
+update public.payment_accounts set is_primary = true where id = :'acc2';
+select public.t_ok((select count(*) = 1 and bool_and(id = :'acc2') from public.payment_accounts where member_id = :'sohaib' and is_primary), 'making the IBAN preferred un-marks the Easypaisa one');
+select public.t_ok((select updated_at = :'acc1_upd' from public.payment_accounts where id = :'acc1'), 'changing only "preferred" is not a change of details');
+select public.t_block(format('update public.payment_accounts set is_primary = false where id = %L', :'acc2'), 'un-marking the preferred account without picking another');
+select public.t_block(format('update public.payment_accounts set member_id = %L where id = %L', :'raees', :'acc1'), 'Sohaib moves his account to Raees''s name');
+select public.t_block(format('update public.payment_accounts set number = %L where id = %L', '123', :'acc1'), 'Sohaib changes his number to something invalid');
+update public.payment_accounts set number = '03019998877' where id = :'acc1';
+select public.t_ok((select number = '03019998877' and updated_at >= :'acc1_upd' from public.payment_accounts where id = :'acc1'), 'Sohaib changes his own number');
+
+-- ===== Raees (owner) can see them but not touch them =====
+select set_config('request.jwt.claim.sub', :'R', false);
+select public.t_ok((select count(*) from public.payment_accounts where member_id = :'sohaib') = 3, 'Raees sees Sohaib''s 3 accounts');
+select public.t_noop(format('update public.payment_accounts set number = %L where id = %L', '03215556666', :'acc1'), 'even the owner can''t change Sohaib''s number');
+select public.t_noop(format('delete from public.payment_accounts where id = %L', :'acc1'), 'even the owner can''t delete Sohaib''s account');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'ali', 'jazzcash', 'Ali', '03331234567'), 'the owner adds an account for Ali (no phone)');
+insert into public.payment_accounts (flat_id, member_id, kind, provider, title, number) values (:'fid', :'raees', 'other', 'SadaPay', 'Raees Ahmad', '0321 1234567');
+select public.t_ok((select is_primary from public.payment_accounts where member_id = :'raees'), 'Raees adds his own SadaPay');
+
+-- ===== outsiders see nothing =====
+select set_config('request.jwt.claim.sub', :'X', false);
+select public.t_ok((select count(*) from public.payment_accounts) = 0, 'outsider sees no accounts');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, title, number) values (%L, %L, %L, %L, %L)', :'fid', :'sohaib', 'jazzcash', 'Hacker', '03451234567'), 'outsider adds an account to Sohaib');
+
+-- ===== limits, delete, lost phone =====
+select set_config('request.jwt.claim.sub', :'B', false);
+insert into public.payment_accounts (flat_id, member_id, kind, provider, title, number) values (:'fid', :'sohaib', 'bank', 'HBL', 'Sohaib Khan', 'PK72HABB0012345678901234');
+insert into public.payment_accounts (flat_id, member_id, kind, provider, title, number) values (:'fid', :'sohaib', 'bank', 'UBL', 'Sohaib Khan', '0109000123456');
+select public.t_block(format('insert into public.payment_accounts (flat_id, member_id, kind, provider, title, number) values (%L, %L, %L, %L, %L, %L)', :'fid', :'sohaib', 'other', 'NayaPay', 'Sohaib', '03001112223'), 'a 6th account');
+delete from public.payment_accounts where id = :'acc2';
+select public.t_ok((select count(*) = 1 from public.payment_accounts where member_id = :'sohaib' and is_primary)
+  and (select is_primary from public.payment_accounts where id = :'acc1'), 'deleting the preferred one makes the oldest left preferred');
+select set_config('request.jwt.claim.sub', :'R', false);
+select public.unlink_member(:'sohaib');
+select set_config('request.jwt.claim.sub', :'B', false);
+select public.t_noop(format('update public.payment_accounts set number = %L where id = %L', '03004445556', :'acc1'), 'Sohaib''s old phone (unlinked) can''t change his number');
+select public.claim_member(:'sohaib');
+update public.payment_accounts set title = 'Sohaib K' where id = :'acc1';
+select public.t_ok((select title = 'Sohaib K' from public.payment_accounts where id = :'acc1'), 'linked again, Sohaib edits his account');
 \echo ALL RULE TESTS PASSED

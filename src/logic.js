@@ -125,7 +125,80 @@ function memberTotals(memberIds, expenses, payments) {
   return t;
 }
 
+// ---- Payment accounts (Easypaisa / JazzCash / bank / other) ----
+// The database checks exactly the same rules (supabase/migrations/004_payment_accounts.sql).
+var ACCOUNT_KINDS = ["easypaisa", "jazzcash", "bank", "other"];
+
+// Tidy what someone typed: no spaces or dashes; +92 / 0092 / 92 mobile numbers become 03…;
+// bank numbers in capitals (IBANs start with PK).
+function cleanAccountNumber(kind, raw) {
+  var s = String(raw == null ? "" : raw).replace(/[\s-]/g, "");
+  if (kind === "easypaisa" || kind === "jazzcash") return s.replace(/^(\+92|0092|92)(3\d{9})$/, "0$2");
+  if (kind === "bank") return s.toUpperCase();
+  return s;
+}
+function cleanText(s) { return String(s == null ? "" : s).replace(/\s+/g, " ").trim(); }
+
+// Pakistani IBAN: PK + 2 check digits + 4-letter bank code + 16 characters, valid mod-97 checksum.
+// The checksum catches any single mistyped character and any two swapped neighbours.
+function ibanOk(v) {
+  if (!/^PK\d{2}[A-Z]{4}[0-9A-Z]{16}$/.test(v)) return false;
+  var s = v.slice(4) + v.slice(0, 4), r = 0;
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i);
+    r = c >= 48 && c <= 57 ? (r * 10 + c - 48) % 97 : (r * 100 + c - 55) % 97;
+  }
+  return r === 1;
+}
+
+// "" when the account is fine, otherwise what's wrong in plain words.
+function accountProblem(a) {
+  var kind = a.kind, provider = cleanText(a.provider), title = cleanText(a.title);
+  var n = cleanAccountNumber(kind, a.number);
+  if (ACCOUNT_KINDS.indexOf(kind) < 0) return "Pick the type of account.";
+  if (kind === "bank" && !provider) return "Pick the bank.";
+  if (kind === "other" && !provider) return "Write which app or service it is.";
+  if (provider.length > 30) return "That name is too long.";
+  if (!n) return kind === "easypaisa" || kind === "jazzcash" ? "Enter the mobile number." : "Enter the account number.";
+  if (kind === "easypaisa" || kind === "jazzcash") {
+    if (!/^03\d{9}$/.test(n)) return "Enter the mobile number like 03001234567 (11 digits).";
+  } else if (kind === "bank") {
+    if (/^PK/.test(n)) {
+      if (n.length !== 24) return "An IBAN has 24 characters. This one has " + n.length + ".";
+      if (!ibanOk(n)) return "That IBAN has a mistake. Check it again.";
+    } else if (!/^\d{6,20}$/.test(n)) return "Enter the account number (6 to 20 digits) or the IBAN.";
+  } else if (!/^[0-9A-Za-z@._+]{4,34}$/.test(n)) return "That account number doesn't look right.";
+  if (title.length < 2) return "Write the name on the account.";
+  if (title.length > 40) return "The name is too long (40 letters at most).";
+  return "";
+}
+
+// How a number is shown: 0300 1234567 · PK36 SCBL 0000 0011 2345 6702 · others as they are.
+// (Copying always uses the plain number, which every app accepts.)
+function formatAccountNumber(n) {
+  n = String(n || "");
+  if (/^03\d{9}$/.test(n)) return n.slice(0, 4) + " " + n.slice(4);
+  if (/^PK\d{2}[A-Z]{4}[0-9A-Z]{16}$/.test(n)) return n.replace(/(.{4})(?!$)/g, "$1 ");
+  return n;
+}
+function accountLabel(a) {
+  if (a.kind === "easypaisa") return "Easypaisa";
+  if (a.kind === "jazzcash") return "JazzCash";
+  return a.provider || (a.kind === "bank" ? "Bank" : "Other");
+}
+// What the payment form should pre-select after paying into this account.
+function methodForAccount(a) { return a.kind === "easypaisa" ? "Easypaisa" : a.kind === "jazzcash" ? "JazzCash" : "Bank"; }
+// One person's accounts: preferred first, then in the order they were added.
+function accountsFor(memberId, accounts) {
+  return accounts.filter(function (a) { return a.memberId === memberId; })
+    .sort(function (x, y) { return (y.primary ? 1 : 0) - (x.primary ? 1 : 0) || x.createdAt - y.createdAt || (x.id < y.id ? -1 : 1); });
+}
+// Details added or changed in the last `days` days: payers are asked to double-check those.
+function recentlyChanged(a, nowMs, days) { return !!a.updatedAt && nowMs - a.updatedAt < days * 864e5; }
+
 if (typeof module !== "undefined") {
   module.exports = { splitAmount: splitAmount, isCounted: isCounted, computeBalances: computeBalances,
-    pairwiseDebts: pairwiseDebts, personSummary: personSummary, pairBreakdown: pairBreakdown, memberTotals: memberTotals };
+    pairwiseDebts: pairwiseDebts, personSummary: personSummary, pairBreakdown: pairBreakdown, memberTotals: memberTotals,
+    cleanAccountNumber: cleanAccountNumber, cleanText: cleanText, ibanOk: ibanOk, accountProblem: accountProblem, formatAccountNumber: formatAccountNumber,
+    accountLabel: accountLabel, methodForAccount: methodForAccount, accountsFor: accountsFor, recentlyChanged: recentlyChanged };
 }

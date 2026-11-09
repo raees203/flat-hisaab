@@ -1,7 +1,8 @@
 // In-memory stand-in for supabase-js that mirrors the real schema's rules,
 // shared between several simulated phones.
 const crypto = require("crypto");
-const db = { flats: [], flat_users: [], members: [], expenses: [], payments: [], attendance: [] };
+const LG = typeof window !== "undefined" ? window : require("../src/logic.js");   // same number checks as the app
+const db = { flats: [], flat_users: [], members: [], expenses: [], payments: [], attendance: [], payment_accounts: [] };
 const files = {};
 const channels = new Set();
 const now = () => new Date().toISOString();
@@ -9,6 +10,17 @@ const isMember = (uid, f) => db.flat_users.some((x) => x.flat_id === f && x.user
 const memberOf = (id) => db.members.find((m) => m.id === id);
 function emit(table) { setTimeout(() => channels.forEach((c) => c.fire(table)), 5); }
 const err = (message) => ({ data: null, error: { message } });
+// payment_accounts guard, as in 004_payment_accounts.sql
+function accountGuard(r, old) {
+  if (old && (r.member_id !== old.member_id || r.flat_id !== old.flat_id)) return "An account can't be moved to someone else";
+  r.title = LG.cleanText(r.title);
+  r.provider = r.kind === "easypaisa" || r.kind === "jazzcash" ? "" : LG.cleanText(r.provider);
+  r.number = LG.cleanAccountNumber(r.kind, r.number);
+  const p = LG.accountProblem(r);
+  if (p) return p;
+  if (db.payment_accounts.some((a) => a.member_id === r.member_id && a.kind === r.kind && a.number === r.number && a.id !== r.id)) return "You already saved this account";
+  return "";
+}
 
 function makeClient(phone) {
   let session = null;
@@ -54,6 +66,16 @@ function makeClient(phone) {
         if (t === "attendance" && !(mine(r.member_id) || owner)) return rls();
         if (t === "expenses" && !(mine(r.paid_by) || (owner && !(memberOf(r.paid_by) || {}).user_id))) return rls();
         if (t === "payments" && !(mine(r.from_member) || mine(r.to_member))) return rls();
+        if (t === "payment_accounts") {
+          if (!mine(r.member_id)) return rls();
+          const e = accountGuard(r, null);
+          if (e) return err(e);
+          const list = db.payment_accounts.filter((a) => a.member_id === r.member_id);
+          if (list.length >= 5) return err("You can save up to 5 accounts");
+          const ts = now();
+          Object.assign(r, { id: crypto.randomUUID(), created_at: ts, updated_at: ts, is_primary: !list.length || !!r.is_primary });
+          if (r.is_primary) list.forEach((a) => { a.is_primary = false; });
+        }
         if (t === "expenses") {
           const sum = Object.values(r.shares).reduce((a, b) => a + b, 0);
           if (sum !== r.amount) return err(`Shares (${sum}) must add up exactly to the amount (${r.amount})`);
@@ -69,13 +91,27 @@ function makeClient(phone) {
           if (i >= 0) db.attendance[i] = r; else db.attendance.push(r);
         } else db[t].push(r);
         emit(t);
-        return { data: null, error: null };
+        return { data: this.ret ? [{ id: r.id }] : null, error: null };
       }
       if (this.op === "update") {
         let rows = this.rows();
         const ownerOf = (f) => (db.flats.find((x) => x.id === f) || {}).owner_id === u;
         if (t === "flats") rows = rows.filter((r) => r.owner_id === u);
         if (t === "payments") rows = rows.filter((r) => (memberOf(r.to_member) || {}).user_id === u);
+        if (t === "payment_accounts") {
+          rows = rows.filter((r) => (memberOf(r.member_id) || {}).user_id === u);
+          for (const r of rows) {
+            const next = { ...r, ...this.p };
+            const e = accountGuard(next, r);
+            if (e) return err(e);
+            if (r.is_primary && next.is_primary === false) return err("Make another account preferred instead");
+            if (["kind", "provider", "title", "number"].some((k) => next[k] !== r[k])) next.updated_at = new Date(Math.max(Date.now(), Date.parse(r.updated_at) + 1)).toISOString();
+            if (next.is_primary && !r.is_primary) db.payment_accounts.forEach((a) => { if (a.member_id === r.member_id && a !== r) a.is_primary = false; });
+            Object.assign(r, next);
+          }
+          emit(t);
+          return { data: this.ret ? rows.map((r) => ({ id: r.id })) : null, error: null };
+        }
         if (t === "expenses") {
           const myMem = (f) => (db.members.find((m) => m.flat_id === f && m.user_id === u) || {}).id;
           for (const r of rows) {
@@ -109,9 +145,14 @@ function makeClient(phone) {
           const myMem = (db.members.find((m) => m.flat_id === r.flat_id && m.user_id === u) || {}).id;
           if (t === "expenses") return r.created_by === u || (owner && r.disputed_by && r.disputed_by !== myMem);
           if (t === "payments") return r.status !== "approved" && r.created_by === u;
+          if (t === "payment_accounts") return (memberOf(r.member_id) || {}).user_id === u;
           return false;
         });
         db[t] = db[t].filter((r) => !rows.includes(r));
+        if (t === "payment_accounts") rows.forEach((d) => {
+          const left = db.payment_accounts.filter((a) => a.member_id === d.member_id).sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+          if (left.length && !left.some((a) => a.is_primary)) left[0].is_primary = true;
+        });
         emit(t);
         return { data: rows.map((r) => ({ id: r.id })), error: null };
       }

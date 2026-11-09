@@ -141,6 +141,17 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .filebtn { position: relative; overflow: hidden; }
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
+/* ---------- payment accounts ---------- */
+.avatar svg { width: 18px; height: 18px; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.row.acc .main { flex: 1 1 9.5rem; }   /* Copy sits beside the number; with very large text it moves below */
+@media (max-width: 380px) { .row.acc .avatar { display: none; } }
+.acc-num { font-size: 1.0625rem; font-weight: 600; letter-spacing: .01em; font-variant-numeric: tabular-nums; margin-top: 2px; overflow-wrap: anywhere; }
+.acc-num.one { white-space: nowrap; }   /* a mobile number never breaks in two */
+.hint { font-size: .8125rem; color: var(--muted); }
+.check { display: flex; align-items: center; gap: 10px; font-size: .9375rem; color: var(--ink-2); cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 0; flex: none; accent-color: var(--accent); }
+
 /* ---------- tab bar ---------- */
 .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
 .tabs .in { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; }

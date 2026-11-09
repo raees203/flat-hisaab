@@ -55,6 +55,18 @@
 var MEALS = [{ k: "nashta", label: "Breakfast" }, { k: "lunch", label: "Lunch" }, { k: "dinner", label: "Dinner" }];
 var MEAL_LABEL = { nashta: "Breakfast", lunch: "Lunch", dinner: "Dinner", other: "Other" };
 var METHODS = ["Cash", "JazzCash", "Easypaisa", "Bank"];
+var ACC_KINDS = [["easypaisa", "Easypaisa"], ["jazzcash", "JazzCash"], ["bank", "Bank"], ["other", "Other"]];
+var BANKS = ["Meezan Bank", "HBL", "UBL", "MCB", "Allied Bank", "Bank Alfalah", "Bank Al Habib", "Faysal Bank", "Askari Bank", "National Bank (NBP)",
+  "Bank of Punjab", "Standard Chartered", "BankIslami", "Dubai Islamic Bank", "JS Bank", "Habib Metro", "Soneri Bank", "Al Baraka"];
+var RECENT_DAYS = 3;   // accounts added or changed this recently get a "check the name" flag
+var MAX_ACCOUNTS = 5;
+var ICON = {
+  wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H17v3.5"/><path d="M4 7.5V17a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1V9.5a1 1 0 0 0-1-1H6.5A2.5 2.5 0 0 1 4 7.5z"/><path d="M15.5 14h1"/></svg>',
+  bank: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5 12 4.5l8.5 5M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7M3.5 20h17"/></svg>',
+  other: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="3" width="11" height="18" rx="2.5"/><path d="M11 17.5h2"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5.5 15H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>'
+};
 var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 var MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -90,7 +102,7 @@ var SB = null;
 var S = {
   view: "boot", uid: null, offline: !navigator.onLine, bootError: "", loadError: "",
   flatId: lsGet("hisaab.flat"), flat: null, myFlats: [],
-  members: [], expenses: [], payments: [], att: {}, attDate: today(), loaded: false,
+  members: [], expenses: [], payments: [], accounts: [], accountsOff: false, lastCopy: null, att: {}, attDate: today(), loaded: false,
   tab: "home", month: today().slice(0, 7), hf: "all", hm: "", sheet: null, ob: null
 };
 var channel = null;
@@ -143,6 +155,8 @@ function errText(e) {
   var m = (e && (e.message || e.error_description || e.msg)) || "";
   if (!navigator.onLine || /fetch|network|Failed to|timeout/i.test(m)) return "Couldn't reach the server. Check your internet and try again.";
   if (/row-level security/i.test(m)) return "You can only change your own entries.";
+  if (/payment_accounts_no_duplicates/.test(m)) return "You already saved this account.";
+  if (/payment_accounts_one_preferred/.test(m)) return "Couldn't save just now. Try again.";
   return m || "Something went wrong. Try again.";
 }
 function fail(e) { toast(errText(e)); }
@@ -157,6 +171,10 @@ function mapExpense(r) {
 function mapPayment(r) {
   return { id: r.id, from: r.from_member, to: r.to_member, amount: r.amount, method: r.method, date: r.date, status: r.status,
     receipt: !!r.receipt_path, receiptPath: r.receipt_path, createdAt: Date.parse(r.created_at), by: r.created_by_member, createdByUid: r.created_by };
+}
+function mapAccount(r) {
+  return { id: r.id, memberId: r.member_id, kind: r.kind, provider: r.provider || "", title: r.title, number: r.number, primary: !!r.is_primary,
+    createdAt: Date.parse(r.created_at), updatedAt: Date.parse(r.updated_at) };
 }
 
 // ---------- data loading ----------
@@ -177,6 +195,13 @@ var loaders = {
   members: function () { return fetchAll("members", "created_at").then(function (rows) { S.members = rows.map(mapMember); }); },
   expenses: function () { return fetchAll("expenses", "created_at").then(function (rows) { S.expenses = rows.map(mapExpense).sort(sortEntries); notifyNewReports(); }); },
   payments: function () { return fetchAll("payments", "created_at").then(function (rows) { S.payments = rows.map(mapPayment).sort(sortEntries); notifyNewPending(); }); },
+  accounts: function () {
+    return fetchAll("payment_accounts", "created_at").then(function (rows) { S.accounts = rows.map(mapAccount); S.accountsOff = false; }, function (e) {
+      // the server doesn't have accounts yet: everything else keeps working, account screens stay hidden
+      if (/payment_accounts|PGRST205|42P01|does not exist/i.test(((e && (e.message || e.code)) || "") + " " + ((e && e.code) || ""))) { S.accounts = []; S.accountsOff = true; return; }
+      throw e;
+    });
+  },
   attendance: function () {
     var date = S.attDate;
     return SB.from("attendance").select("*").eq("flat_id", S.flatId).eq("date", date).then(function (r) {
@@ -196,7 +221,7 @@ function refresh(table) {
       busy[table] = false;
       if (table === "flat" && !S.flat) { leaveToOnboarding("You're no longer part of that flat."); return; }
       renderAll();
-      if (S.sheet && ["expense", "payment", "copy", "image"].indexOf(S.sheet.type) < 0) renderSheet();
+      if (S.sheet && ["expense", "payment", "account", "copy", "image"].indexOf(S.sheet.type) < 0) renderSheet();
     }).catch(function () { busy[table] = false; if (!navigator.onLine) { S.offline = true; renderBanner(); } });
   }, 250);
 }
@@ -204,7 +229,7 @@ function loadEverything() {
   S.loaded = false; S.loadError = ""; renderAll();
   return loaders.flat().then(function () {
     if (!S.flat) { leaveToOnboarding("That flat isn't available any more. Join again with its code."); return; }
-    return Promise.all([loaders.members(), loaders.expenses(), loaders.payments(), loaders.attendance()]).then(function () {
+    return Promise.all([loaders.members(), loaders.expenses(), loaders.payments(), loaders.attendance(), loaders.accounts()]).then(function () {
       S.loaded = true; S.offline = false; renderAll();
     });
   }).catch(function (e) { S.offline = !navigator.onLine; S.loadError = errText(e); renderAll(); });
@@ -217,6 +242,8 @@ function subscribe() {
     .on("postgres_changes", { event: "*", schema: "public", table: "payments", filter: f }, function () { refresh("payments"); })
     .on("postgres_changes", { event: "*", schema: "public", table: "members", filter: f }, function () { refresh("members"); })
     .on("postgres_changes", { event: "*", schema: "public", table: "attendance", filter: f }, function () { refresh("attendance"); })
+    .on("postgres_changes", { event: "*", schema: "public", table: "payment_accounts", filter: f }, function () { refresh("accounts"); })
+    .on("postgres_changes", { event: "DELETE", schema: "public", table: "payment_accounts" }, function () { refresh("accounts"); })
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "flats", filter: "id=eq." + S.flatId }, function () { refresh("flat"); })
     .on("postgres_changes", { event: "DELETE", schema: "public", table: "expenses" }, function () { refresh("expenses"); })
     .on("postgres_changes", { event: "DELETE", schema: "public", table: "payments" }, function () { refresh("payments"); })
@@ -224,7 +251,7 @@ function subscribe() {
 }
 function openFlat(id) {
   S.flatId = id; lsSet("hisaab.flat", id);
-  S.flat = null; S.members = []; S.expenses = []; S.payments = []; S.att = {}; S.attDate = today();
+  S.flat = null; S.members = []; S.expenses = []; S.payments = []; S.accounts = []; S.accountsOff = false; S.lastCopy = null; S.att = {}; S.attDate = today();
   S.view = "app"; S.tab = "home"; closeSheet();
   loadEverything().then(function () { if (S.view === "app" && S.flat) { subscribe(); askNotifyPermission(); } });
 }
@@ -331,7 +358,16 @@ function remindText(other) {
   b.items.filter(function (i) { return i.amount; }).slice(-8).forEach(function (i) {
     lines.push("• " + fmtDate(i.date) + " · " + (i.kind === "payment" ? "payment" : itemTitle(i)) + ": " + signed(i.amount));
   });
+  var mine = S.accountsOff ? [] : myAccounts().slice(0, 3);
+  if (mine.length === 1) lines.push("", "Send it to my " + accountLine(mine[0]));
+  else if (mine.length) { lines.push("", "You can send it to:"); mine.forEach(function (a) { lines.push("• " + accountLine(a)); }); }
   return lines.join("\n");
+}
+// "Easypaisa: 03001234567 (Raees Ahmad)" — plain number, so it can be copied from WhatsApp
+function accountLine(a) { return accountLabel(a) + (a.kind === "bank" && /^PK/.test(a.number) ? " IBAN" : "") + ": " + a.number + " (" + a.title + ")"; }
+function askText(other, amount) {
+  return "Hi " + nameOf(other) + ", I want to send you the " + rs(amount) + " I owe you on Flat Hisaab. " +
+    "Please add your Easypaisa, JazzCash or bank account in the app (Settings → Your accounts), then I can copy it from there.";
 }
 function inviteText() {
   return "Join *" + flatName() + "* on Flat Hisaab to split our food costs.\n\n" +
@@ -346,9 +382,15 @@ function reportText(m) {
   t.forEach(function (x) { lines.push("• " + nameOf(x.from) + " → " + nameOf(x.to) + ": " + rs(x.amount)); });
   return lines.join("\n");
 }
-function copyText(text) {
-  try { navigator.clipboard.writeText(text).then(function () { toast("Copied"); }, function () { openSheet({ type: "copy", text: text }); }); }
-  catch (e) { openSheet({ type: "copy", text: text }); }
+// Copy: the app's own clipboard (Android), else the browser's (web / iPhone), else a box to copy from by hand.
+function copyText(text, msg) {
+  var done = function () { toast(msg || "Copied"); };
+  var byHand = function () { openSheet({ type: "copy", text: text }, true); };
+  var web = function () {
+    try { navigator.clipboard.writeText(text).then(done, byHand); } catch (e) { byHand(); }
+  };
+  if (Cap.Clipboard) { try { Cap.Clipboard.write({ string: text }).then(done, web); return; } catch (e) {} }
+  web();
 }
 
 // ---------- month data ----------
@@ -481,6 +523,10 @@ function renderHome() {
       '<button data-act="open-list" data-v="pay"><span class="k">You owe</span><span class="v num bad-t">' + rs(sm.toPay) + '</span><span class="s">' + (sm.pay.length ? "to " + people(sm.pay.length) : "you owe nobody") + "</span></button></div>" +
       '<div class="netline"><span>Overall <b class="num ' + (n > 0 ? "good-t" : n < 0 ? "bad-t" : "") + '">' + (n ? signed(n) : "settled") + "</b></span>" +
       (waiting ? '<span class="num">Awaiting approval ' + rs(waiting) + "</span>" : "") + "</div></div>";
+    if (!S.accountsOff && !myAccounts().length && S.members.length > 1 && lsGet("hisaab.accNudge." + S.flatId) !== "1") {
+      h += '<div class="note stack tight"><div><b>Add your account</b><div style="margin-top:2px">Add your Easypaisa, JazzCash or bank account so flatmates who owe you can copy it and pay.</div></div>' +
+        '<div class="btnrow"><button class="btn sm" data-act="nudge-later">Later</button><button class="btn sm primary" data-act="acc-add">Add account</button></div></div>';
+    }
     var rows = relRows(me);
     h += '<div class="section-h"><h2>Your balances</h2><button class="link" data-act="share-dues">Share</button></div>';
     h += '<div class="card flush"><div class="list">' + (rows.length ? rows.map(function (r) {
@@ -624,6 +670,7 @@ function renderSheet() {
   else if (s.type === "list") html = sheetWrap(s.v === "receive" ? "You'll get" : "You owe", listBody(s.v));
   else if (s.type === "approvals") html = sheetWrap("Needs your attention", approvalsSheet());
   else if (s.type === "settings") html = sheetWrap("Settings", settingsBody());
+  else if (s.type === "account") html = sheetWrap(s.id ? "Edit account" : "Add account", accountForm(s));
   else if (s.type === "image") html = sheetWrap("Report image", '<p class="small muted" style="margin-bottom:12px">Long-press the image to save or share it.</p><img class="receipt-img" src="' + s.src + '" alt="Report">');
   else if (s.type === "copy") html = sheetWrap("Copy", '<p class="small muted" style="margin-bottom:12px">Select the text and copy it.</p><textarea class="input copybox" id="copybox" readonly>' + esc(s.text) + "</textarea>");
   root.innerHTML = html;
@@ -641,8 +688,20 @@ function personSheet(other) {
   var h = '<div class="stack"><div class="card"><div class="small muted">' + (v > 0 ? name + " owes you" : v < 0 ? "You owe " + name : "You and " + name + " are settled") + '</div>' +
     '<div class="num ' + (v > 0 ? "good-t" : v < 0 ? "bad-t" : "muted") + '" style="font-size:2rem;font-weight:600;letter-spacing:-0.02em">' + rs(v) + "</div>";
   if (v > 0) h += '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="remind" data-id="' + esc(other) + '">Remind</button><button class="btn primary" data-act="add-payment" data-dir="in" data-other="' + esc(other) + '" data-amt="' + v + '">Mark as received</button></div>';
-  if (v < 0) h += '<div class="btnrow" style="margin-top:12px"><button class="btn primary" data-act="add-payment" data-dir="out" data-other="' + esc(other) + '" data-amt="' + (-v) + '">Pay ' + rs(v) + "</button></div>";
+  var accs = S.accountsOff ? [] : accountsFor(other, S.accounts);
+  var payBtn = function (label, cls) { return '<button class="btn ' + cls + '" data-act="add-payment" data-dir="out" data-other="' + esc(other) + '" data-amt="' + (-v) + '">' + label + "</button>"; };
+  if (v < 0 && !accs.length) {
+    h += (S.accountsOff ? "" : '<p class="small muted" style="margin-top:6px">' + name + " hasn't added an account yet.</p>") + '<div class="btnrow" style="margin-top:12px">' +
+      (S.accountsOff ? "" : '<button class="btn" data-act="acc-ask" data-id="' + esc(other) + '" data-amt="' + (-v) + '">Ask for account</button>') + payBtn("Pay " + rs(v), "primary") + "</div>";
+  }
   h += "</div>";
+  if (v < 0 && accs.length) {
+    // where to send it: each account with a Copy button, then "I've paid" records the payment
+    h += '<div class="section-h"><h2>Send to ' + name + '</h2><button class="link" data-act="acc-copy-amt" data-amt="' + (-v) + '">Copy amount</button></div>' +
+      '<div class="card flush"><div class="list">' + accs.map(function (a) { return accountPayRow(a, accs.length); }).join("") + "</div></div>" +
+      '<p class="tiny muted" style="margin:0 2px">Before you send, check that your app shows the same name. Then come back and tap “I\'ve paid”.</p>' +
+      payBtn("I've paid " + rs(v), "primary block");
+  }
   if (!b.items.length) return h + '<div class="empty">Nothing between you two yet.</div></div>';
   h += '<div class="section-h"><h2>How it adds up</h2><span class="tiny muted">' + b.items.length + (b.items.length === 1 ? " item" : " items") + '</span></div><div class="card flush"><div class="list">';
   h += b.items.slice().reverse().map(function (it) {
@@ -871,13 +930,135 @@ function memberDetail(id) {
     '<div class="stats two"><div class="stat"><div class="v num">' + rs(t.paid) + '</div><div class="k">Spent on the flat</div></div><div class="stat"><div class="v num">' + rs(t.share) + '</div><div class="k">His share</div></div>' +
     '<div class="stat"><div class="v num">' + rs(t.sent) + '</div><div class="k">Payments made</div></div><div class="stat"><div class="v num">' + rs(t.received) + '</div><div class="k">Payments received</div></div></div>' +
     '<p class="tiny muted" style="margin:0 2px">spent − share + paid − received = ' + signed(net) + " (approved payments only)</p>" +
+    memberAccounts(id) +
     (myId() && id !== myId() ? '<button class="btn block" data-act="open-person" data-id="' + esc(id) + '" data-back="1">See what\'s between you two</button>' : "") + "</div>";
+}
+function memberAccounts(id) {
+  if (S.accountsOff) return "";
+  var accs = accountsFor(id, S.accounts), mine = id === myId();
+  var h = '<div class="section-h"><h2>' + (mine ? "Your accounts" : "Accounts") + "</h2>" + (mine ? '<button class="link" data-act="acc-add" data-back="1">Add</button>' : "") + "</div>";
+  if (!accs.length) return h + '<p class="small muted" style="margin:0 2px">' + (mine ? "You haven't added an account yet." : esc(nameOf(id)) + " hasn't added an account yet.") + "</p>";
+  return h + '<div class="card flush"><div class="list">' + accs.map(function (a) { return accountPayRow(a, accs.length); }).join("") + "</div></div>";
+}
+
+// --- payment accounts ---
+function myAccounts() { var me = myId(); return me ? accountsFor(me, S.accounts) : []; }
+function accIcon(a) { return '<span class="avatar">' + (a.kind === "bank" ? ICON.bank : a.kind === "other" ? ICON.other : ICON.wallet) + "</span>"; }
+function agoText(ms) {
+  var a = new Date(ms), b = new Date(); a.setHours(0, 0, 0, 0); b.setHours(0, 0, 0, 0);
+  var d = Math.round((b - a) / 864e5);
+  return d <= 0 ? "today" : d === 1 ? "yesterday" : d + " days ago";
+}
+// new or changed in the last few days: payers should double-check the name
+function recentPill(a) {
+  if (!recentlyChanged(a, Date.now(), RECENT_DAYS)) return "";
+  return ' <span class="pill wait">' + (a.updatedAt > a.createdAt ? "Changed " : "Added ") + agoText(a.updatedAt) + "</span>";
+}
+function preferredPill(a, count) { return count > 1 && a.primary ? ' <span class="pill even">Preferred</span>' : ""; }
+// someone's account as everyone else sees it: the number big, the name under it, and Copy
+function accountPayRow(a, count) {
+  return '<div class="row acc">' + accIcon(a) + '<span class="main"><span class="t">' + esc(accountLabel(a)) + preferredPill(a, count) + recentPill(a) + "</span>" +
+    '<div class="acc-num' + (/^03\d{9}$/.test(a.number) ? " one" : "") + '">' + esc(formatAccountNumber(a.number)) + '</div><div class="s">' + esc(a.title) + "</div></span>" +
+    '<span class="end"><button class="btn sm" data-act="acc-copy" data-id="' + esc(a.id) + '" aria-label="Copy ' + esc(accountLabel(a)) + ' number">' + ICON.copy + "Copy</button></span></div>";
+}
+// your own account in Settings: tap to edit
+function accountOwnRow(a, count) {
+  return '<button class="row" data-act="acc-edit" data-id="' + esc(a.id) + '" data-back="1">' + accIcon(a) + '<span class="main"><span class="t">' + esc(accountLabel(a)) + preferredPill(a, count) + "</span>" +
+    '<div class="s">' + esc(formatAccountNumber(a.number)) + " · " + esc(a.title) + '</div></span><span class="end">' + CHEV + "</span></button>";
+}
+function accountsSection() {
+  if (!myId() || S.accountsOff) return "";
+  var list = myAccounts();
+  var h = '<div class="section-h"><h2>Your accounts</h2><span class="tiny muted">flatmates pay you here</span></div>';
+  if (!list.length) return h + '<div class="card stack tight"><p class="small muted">Add your Easypaisa, JazzCash or bank account. Anyone who owes you can copy it and pay you.</p>' +
+    '<button class="btn primary block" data-act="acc-add" data-back="1">Add account</button></div>';
+  return h + '<div class="card flush"><div class="list">' + list.map(function (a) { return accountOwnRow(a, list.length); }).join("") +
+    (list.length < MAX_ACCOUNTS ? '<button class="row" data-act="acc-add" data-back="1"><span class="avatar">' + ICON.plus + '</span><span class="main"><span class="t">Add another account</span></span></button>' : "") + "</div></div>";
+}
+function openAccountForm(id, back) {
+  var a = id ? findById(S.accounts, id) : null, mine = myAccounts();
+  if (!myId()) { toast("Pick your name first."); return; }
+  if (a && a.memberId !== myId()) { toast("You can only change your own accounts."); return; }
+  if (!a && mine.length >= MAX_ACCOUNTS) { toast("You can save up to " + MAX_ACCOUNTS + " accounts."); return; }
+  var bank = a && a.kind === "bank" ? (BANKS.indexOf(a.provider) >= 0 ? a.provider : "__other") : "";
+  openSheet({ type: "account", id: a ? a.id : null, kind: a ? a.kind : "easypaisa", bank: bank,
+    provider: a && (a.kind === "other" || bank === "__other") ? a.provider : "", number: a ? formatAccountNumber(a.number) : "",
+    title: a ? a.title : (mine[0] ? mine[0].title : ""), primary: false, focus: a ? null : "acc-num" }, back);
+}
+function accountForm(s) {
+  var wallet = s.kind === "easypaisa" || s.kind === "jazzcash", editing = s.id ? findById(S.accounts, s.id) : null;
+  var h = '<div class="stack"><div class="field"><span class="lab">Type</span><div class="seg">' +
+    ACC_KINDS.map(function (k) { return '<button data-act="acc-kind" data-v="' + k[0] + '" aria-pressed="' + (s.kind === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</div></div>";
+  if (s.kind === "bank") {
+    h += '<div class="field"><label for="acc-bank">Bank</label><select class="input" id="acc-bank"><option value="">Pick your bank</option>' +
+      BANKS.map(function (b) { return '<option value="' + esc(b) + '"' + (s.bank === b ? " selected" : "") + ">" + esc(b) + "</option>"; }).join("") +
+      '<option value="__other"' + (s.bank === "__other" ? " selected" : "") + ">Another bank</option></select></div>";
+    if (s.bank === "__other") h += '<div class="field"><label for="acc-prov">Bank name</label><input class="input" id="acc-prov" maxlength="30" placeholder="Bank name" value="' + esc(s.provider) + '"></div>';
+  }
+  if (s.kind === "other") h += '<div class="field"><label for="acc-prov">App or service</label><input class="input" id="acc-prov" maxlength="30" placeholder="SadaPay, NayaPay, Raast…" value="' + esc(s.provider) + '"></div>';
+  h += '<div class="field"><label for="acc-num">' + (wallet ? "Mobile number" : s.kind === "bank" ? "Account number or IBAN" : "Account number or ID") + "</label>" +
+    '<input class="input" id="acc-num" ' + (wallet ? 'inputmode="tel"' : 'autocapitalize="characters"') + ' autocomplete="off" spellcheck="false" maxlength="40" placeholder="' +
+    (s.kind === "bank" ? "PK36 SCBL 0000 0011 2345 6702" : "0300 1234567") + '" value="' + esc(s.number) + '"></div>' +
+    '<div class="field"><label for="acc-title">Name on the account</label><input class="input" id="acc-title" maxlength="40" autocomplete="name" placeholder="Your full name" value="' + esc(s.title) + '">' +
+    '<span class="hint">Write it the way ' + (s.kind === "bank" ? "the bank" : "the app") + " shows it. Flatmates check this name before they send money.</span></div>";
+  if (myAccounts().length && !(editing && editing.primary)) h += '<label class="check"><input type="checkbox" id="acc-primary"' + (s.primary ? " checked" : "") + "> Make this my preferred account</label>";
+  h += '<div class="note warn">Only the number people send money to. Never write a PIN, password or CNIC here.</div>' +
+    '<div class="err" id="acc-err"></div><button class="btn primary block" data-act="acc-save"' + (s.saving ? " disabled" : "") + ">" + (s.saving ? "Saving…" : "Save account") + "</button>";
+  if (editing) {
+    h += s.confirm ? '<div class="card stack tight"><div>Delete this account? Flatmates won\'t see it any more.</div><div class="btnrow"><button class="btn" data-act="acc-del-no">Cancel</button><button class="btn danger" data-act="acc-del-yes">Delete</button></div></div>'
+      : '<button class="btn danger block" data-act="acc-del-ask">Delete account</button>';
+  }
+  return h + "</div>";
+}
+function readAccountInputs() {
+  var s = S.sheet; if (!s || s.type !== "account") return;
+  if ($("acc-bank")) s.bank = $("acc-bank").value;
+  if ($("acc-prov")) s.provider = $("acc-prov").value;
+  if ($("acc-num")) s.number = $("acc-num").value;
+  if ($("acc-title")) s.title = $("acc-title").value;
+  if ($("acc-primary")) s.primary = $("acc-primary").checked;
+}
+function saveAccount() {
+  var s = S.sheet; readAccountInputs();
+  var err = $("acc-err"), me = myId(), editing = s.id ? findById(S.accounts, s.id) : null;
+  if (!me) { err.textContent = "Pick your name first."; return; }
+  var provider = s.kind === "bank" ? (s.bank === "__other" ? s.provider : s.bank) : s.kind === "other" ? s.provider : "";
+  var row = { kind: s.kind, provider: cleanText(provider), title: cleanText(s.title), number: cleanAccountNumber(s.kind, s.number) };
+  var problem = accountProblem(row);
+  if (problem) { err.textContent = problem; return; }
+  if (myAccounts().some(function (a) { return a.id !== s.id && a.kind === row.kind && a.number === row.number; })) { err.textContent = "You already saved this account."; return; }
+  if (s.primary && !(editing && editing.primary)) row.is_primary = true;
+  s.saving = true; renderSheet();
+  var q = editing ? SB.from("payment_accounts").update(row).eq("id", s.id).select("id")
+    : SB.from("payment_accounts").insert(Object.assign({ flat_id: S.flatId, member_id: me }, row)).select("id");
+  q.then(function (r) {
+    if (r.error) throw r.error;
+    if (!r.data || !r.data.length) throw new Error("You can only change your own accounts.");
+    closeOrBack(); toast(editing ? "Account updated" : "Saved. Flatmates can now copy it."); refresh("accounts");
+  }).catch(function (e) {
+    s.saving = false; renderSheet();
+    if ($("acc-err")) $("acc-err").textContent = errText(e); else fail(e);
+  });
+}
+function deleteAccount() {
+  var s = S.sheet;
+  SB.from("payment_accounts").delete().eq("id", s.id).select("id").then(function (r) {
+    if (r.error) throw r.error;
+    if (!r.data || !r.data.length) throw new Error("You can only delete your own accounts.");
+    closeOrBack(); toast("Account deleted"); refresh("accounts");
+  }).catch(fail);
+}
+function copyAccount(id) {
+  var a = findById(S.accounts, id); if (!a) return;
+  S.lastCopy = { member: a.memberId, id: a.id, at: Date.now() };
+  var what = accountLabel(a) + (a.kind === "bank" && /^PK/.test(a.number) ? " IBAN" : " number");
+  copyText(a.number, (a.memberId === myId() ? "Your " : nameOf(a.memberId) + "'s ") + what + " copied");
 }
 
 // --- settings ---
 function settingsBody() {
   var owner = isOwner(), me = myId();
-  var h = '<div class="stack"><div class="card stack tight"><h3>Invite flatmates</h3><div class="codebox">' + esc(S.flat ? S.flat.code : "") + '</div>' +
+  var h = '<div class="stack">' + accountsSection() + '<div class="card stack tight"><h3>Invite flatmates</h3><div class="codebox">' + esc(S.flat ? S.flat.code : "") + '</div>' +
     '<p class="small muted">They open the app, tap “Join a flat” and type this code.</p><button class="btn primary block" data-act="share-invite">Share invite</button></div>';
   if (!me) {
     h += '<div class="card stack tight"><div class="field"><label for="st-me">Who are you?</label><select class="input" id="st-me"><option value="">Pick your name</option>' +
@@ -941,7 +1122,14 @@ function startPayment(dir, other, amt) {
     var v = pairBreakdown(me, other, S.expenses, S.payments).total;
     amt = dir === "out" ? (v < 0 ? -v : "") : (v > 0 ? v : "");
   }
-  openSheet({ type: "payment", dir: dir, other: other, amount: amt ? String(amt) : "", method: "JazzCash", date: today(), img: null, focus: "py-amt" });
+  // "How" starts as the account the money most likely went to: the one just copied, else the preferred one
+  var acc = null;
+  if (dir === "out") {
+    var theirs = accountsFor(other, S.accounts);
+    if (S.lastCopy && S.lastCopy.member === other && Date.now() - S.lastCopy.at < 3600e3) acc = findById(theirs, S.lastCopy.id);
+    acc = acc || theirs[0];
+  } else acc = myAccounts()[0];
+  openSheet({ type: "payment", dir: dir, other: other, amount: amt ? String(amt) : "", method: acc ? methodForAccount(acc) : "JazzCash", date: today(), img: null, focus: "py-amt" });
 }
 
 document.addEventListener("click", function (ev) {
@@ -1075,6 +1263,18 @@ document.addEventListener("click", function (ev) {
       SB.from("members").insert({ flat_id: S.flatId, name: nn }).then(function (r) { if (r.error) throw r.error; toast(nn + " added"); refresh("members"); }).catch(fail); break;
     }
     case "switch-flat": leaveToOnboarding(); break;
+    // payment accounts
+    case "acc-add": openAccountForm(null, back); break;
+    case "acc-edit": openAccountForm(id, back); break;
+    case "acc-kind": readAccountInputs(); s.kind = el.getAttribute("data-v"); renderSheet(); break;
+    case "acc-save": saveAccount(); break;
+    case "acc-del-ask": readAccountInputs(); s.confirm = true; renderSheet(); break;
+    case "acc-del-no": s.confirm = false; renderSheet(); break;
+    case "acc-del-yes": deleteAccount(); break;
+    case "acc-copy": copyAccount(id); break;
+    case "acc-copy-amt": copyText(el.getAttribute("data-amt"), "Amount copied: " + rs(+el.getAttribute("data-amt"))); break;
+    case "acc-ask": shareText(askText(id, +el.getAttribute("data-amt"))); break;
+    case "nudge-later": lsSet("hisaab.accNudge." + S.flatId, "1"); renderMain(); toast("You can add it any time in Settings."); break;
   }
 });
 document.addEventListener("input", function (ev) {
@@ -1091,6 +1291,7 @@ document.addEventListener("change", function (ev) {
   if (t.id === "py-other") { readPaymentInputs(); S.sheet.amount = ""; var a = startAmount(S.sheet); if (a) { S.sheet.amount = String(a); $("py-amt").value = a; } updatePayNote(); }
   if (t.id === "hm") { S.hm = t.value; renderMain(); }
   if (t.id === "st-me") setMe(t.value);
+  if (t.id === "acc-bank") { readAccountInputs(); renderSheet(); if (S.sheet.bank === "__other" && $("acc-prov")) $("acc-prov").focus(); }
   if (t.id === "shot-in" && t.files && t.files[0]) {
     var s = S.sheet; if (!s) return;
     if (s.type === "expense") readExpenseInputs(); else readPaymentInputs();
@@ -1197,10 +1398,10 @@ function boot() {
     renderAll();
   });
 }
-window.addEventListener("online", function () { S.offline = false; renderBanner(); if (S.view === "boot") boot(); else if (S.flatId) { ["flat", "members", "expenses", "payments", "attendance"].forEach(refresh); } });
+window.addEventListener("online", function () { S.offline = false; renderBanner(); if (S.view === "boot") boot(); else if (S.flatId) { ["flat", "members", "expenses", "payments", "attendance", "accounts"].forEach(refresh); } });
 window.addEventListener("offline", function () { S.offline = true; renderBanner(); });
 document.addEventListener("visibilitychange", function () {
-  if (document.visibilityState === "visible" && S.view === "app" && S.flatId && SB) ["members", "expenses", "payments", "attendance"].forEach(refresh);
+  if (document.visibilityState === "visible" && S.view === "app" && S.flatId && SB) ["members", "expenses", "payments", "attendance", "accounts"].forEach(refresh);
 });
 if (Cap.App) {
   Cap.App.addListener("backButton", function () {

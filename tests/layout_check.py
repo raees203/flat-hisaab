@@ -18,7 +18,7 @@ open(WWW + "/_onboard.html", "w").write(page_html(True))
 
 CHECK = """() => {
   const bad = [];
-  document.querySelectorAll('.t, .s, .k, .v, .amt, h1, h2, h3, .btn, .chip, .lbl, .pill, td, th, label, .lab').forEach(el => {
+  document.querySelectorAll('.t, .s, .k, .v, .amt, h1, h2, h3, .btn, .chip, .lbl, .pill, td, th, label, .lab, .acc-num, .hint').forEach(el => {
     const r = el.getBoundingClientRect();
     if (!r.width || !r.height) return;
     const cs = getComputedStyle(el), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.45;
@@ -65,6 +65,9 @@ with sync_playwright() as p:
             pg.click('[data-tab="today"]'); shot("today")
             pg.click('[data-tab="report"]'); shot("report")
             pg.click('[data-act="open-settings"]'); shot("settings")
+            pg.click('#sheetRoot [data-act="acc-add"]'); pg.click('[data-act="acc-kind"][data-v="bank"]'); shot("account-form")
+            pg.click('[data-act="close-all"]')
+            pg.click('[data-act="open-member"][data-id="m1"]'); shot("member-accounts")
             pg.click('[data-act="close-all"]')
             pg.click('[data-tab="home"]'); pg.click('[data-act="add-payment"]') if pg.query_selector('[data-act="add-payment"]') else None
             if errs: problems[f"{label}-js"] = errs

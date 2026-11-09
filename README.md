@@ -3,7 +3,7 @@
 Android app for flatmates to split daily food costs: who paid, who ate, who owes whom.
 
 - **App**: `src/` (HTML/JS), packaged with Capacitor into `android/`
-- **Backend**: Supabase (free plan). Schema and all security rules: `supabase/migrations/` (001 initial, 002 no-tampering, 003 report a wrong expense)
+- **Backend**: Supabase (free plan). Schema and all security rules: `supabase/migrations/` (001 initial, 002 no-tampering, 003 report a wrong expense, 004 payment accounts)
 - **APK** (Android): built by GitHub Actions on every push to `main` (`.github/workflows/build.yml`).
   Download it from the latest Release, or from the `apk` branch.
 - **Web app** (iPhone / any browser): the same app, published to GitHub Pages at
@@ -19,9 +19,13 @@ Android app for flatmates to split daily food costs: who paid, who ate, who owes
 - Only the owner renames the flat or manages members; anyone can rename himself.
 - An expense's shares must add up exactly to its amount (whole rupees).
 - A name can be linked to only one phone; only the flat owner can unlink a lost phone.
+- **Payment accounts** (Easypaisa / JazzCash / bank / other): everyone in the flat can see and copy them, but only the
+  phone linked to that name can add, change or delete them, not even the flat owner. Numbers are checked on the server
+  (03XXXXXXXXX, IBAN checksum); up to 5 per person, one preferred. Accounts added or changed in the last 3 days are
+  flagged so payers double-check the name before sending.
 
 ## Tests
-- `npm test` — money logic (exact splits, balances, per-person breakdowns; thousands of random flats)
+- `npm test` — money logic (exact splits, balances, per-person breakdowns; thousands of random flats) and account-number checks
 - `supabase/test/rules_test.sql` — every security rule against a real Postgres
 - `tests/app.test.js` — three simulated phones using the app together (needs `jsdom`)
 - `tests/layout_check.py` — screenshots every screen at 320–1280px and large font, flags squeezed text

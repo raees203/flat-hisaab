@@ -21,6 +21,15 @@
   e1.disputed_by = "m1"; e1.dispute_note = "I only had half"; e1.disputed_at = new Date().toISOString();
   db.payments.push({ id: "p1", flat_id: "f1", from_member: "m1", to_member: "m0", amount: 500, method: "JazzCash", date: d(0), status: "pending", created_by: "s-uid", created_by_member: "m1", created_at: new Date().toISOString() });
   db.payments.push({ id: "p2", flat_id: "f1", from_member: "m3", to_member: "m0", amount: 300, method: "Cash", date: d(1), status: "approved", created_by: me, created_by_member: "m0", created_at: new Date().toISOString() });
+  // payment accounts: Sohaib (Raees owes him Rs 100) has Easypaisa + a Meezan IBAN changed yesterday; Raees has two
+  var old = new Date(now - 20 * 864e5).toISOString(), yday = new Date(now - 864e5).toISOString();
+  function acc(id, m, kind, provider, title, number, primary, upd) {
+    db.payment_accounts.push({ id: id, flat_id: "f1", member_id: m, kind: kind, provider: provider, title: title, number: number, is_primary: primary, created_at: old, updated_at: upd || old });
+  }
+  acc("a1", "m1", "easypaisa", "", "Sohaib Khan", "03001234567", true);
+  acc("a2", "m1", "bank", "Meezan Bank", "Sohaib Khan Niazi", "PK23MEZN0001020104567890", false, yday);
+  acc("a3", "m0", "jazzcash", "", "Raees Ahmad", "03211234567", true);
+  acc("a4", "m0", "bank", "HBL", "Raees Ahmad", "PK72HABB0012345678901234", false);
   var client = M.makeClient("raees");
   client.auth.signInAnonymously().then(function (r) { r.data.session.user.id = me; });
   client.auth.getSession = async function () { return { data: { session: { user: { id: me } } } }; };

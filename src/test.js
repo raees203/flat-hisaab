@@ -117,4 +117,56 @@ for (let run = 0; run < 1500; run++) {
     assert.strictEqual(L.pairBreakdown(a, b, exps, pays).total, owed, "breakdown must equal balance");
   }
 }
-console.log("all tests passed (incl. 3000 random flats + 1500 breakdown flats)");
+// --- payment accounts: tidy, check, show ---
+{
+  const C = L.cleanAccountNumber, P = L.accountProblem;
+  assert.strictEqual(C("easypaisa", "+92 300-1234567"), "03001234567");
+  assert.strictEqual(C("jazzcash", "923001234567"), "03001234567");
+  assert.strictEqual(C("jazzcash", "0092 3001234567"), "03001234567");
+  assert.strictEqual(C("easypaisa", "0300 123 4567"), "03001234567");
+  assert.strictEqual(C("bank", "pk36 scbl 0000 0011 2345 6702"), "PK36SCBL0000001123456702");
+  assert.strictEqual(C("other", " 0321-1234567 "), "03211234567");
+  const ep = (number, title = "Raees Ahmad") => P({ kind: "easypaisa", number, title });
+  assert.strictEqual(ep("03001234567"), "");
+  assert.strictEqual(ep("+923001234567"), "");
+  assert.ok(ep("0300123456"), "10 digits is too short");
+  assert.ok(ep("04235761234"), "landline is not a wallet");
+  assert.ok(ep(""), "empty number");
+  assert.ok(ep("03001234567", "R"), "one-letter title");
+  assert.ok(ep("03001234567", "x".repeat(41)), "title too long");
+  assert.strictEqual(P({ kind: "bank", provider: "Standard Chartered", number: "PK36SCBL0000001123456702", title: "Ali" }), "");
+  assert.ok(/mistake/.test(P({ kind: "bank", provider: "Standard Chartered", number: "PK36SCBL0000001123456703", title: "Ali" })));
+  assert.ok(/24 characters/.test(P({ kind: "bank", provider: "HBL", number: "PK36SCBL00000011234567", title: "Ali" })));
+  assert.strictEqual(P({ kind: "bank", provider: "Meezan Bank", number: "0102 0104567890", title: "Ali" }), "");
+  assert.ok(P({ kind: "bank", provider: "", number: "01020104567890", title: "Ali" }), "bank must be picked");
+  assert.ok(P({ kind: "bank", provider: "HBL", number: "12345", title: "Ali" }), "5 digits is too short");
+  assert.ok(P({ kind: "other", provider: "", number: "03001234567", title: "Ali" }), "other needs a name");
+  assert.strictEqual(P({ kind: "other", provider: "SadaPay", number: "0300 1234567", title: "Ali" }), "");
+  assert.ok(P({ kind: "cash", number: "1", title: "Ali" }), "unknown kind");
+  assert.strictEqual(L.formatAccountNumber("03001234567"), "0300 1234567");
+  assert.strictEqual(L.formatAccountNumber("PK36SCBL0000001123456702"), "PK36 SCBL 0000 0011 2345 6702");
+  assert.strictEqual(L.formatAccountNumber("01020104567890"), "01020104567890");
+  assert.strictEqual(L.accountLabel({ kind: "bank", provider: "Meezan Bank" }), "Meezan Bank");
+  assert.strictEqual(L.accountLabel({ kind: "jazzcash", provider: "" }), "JazzCash");
+  assert.strictEqual(L.methodForAccount({ kind: "other" }), "Bank");
+  assert.strictEqual(L.methodForAccount({ kind: "easypaisa" }), "Easypaisa");
+  const acc = [{ id: "a", memberId: "m1", createdAt: 1 }, { id: "b", memberId: "m1", createdAt: 2, primary: true }, { id: "c", memberId: "m2", createdAt: 0 }, { id: "d", memberId: "m1", createdAt: 3 }];
+  assert.deepStrictEqual(L.accountsFor("m1", acc).map((a) => a.id), ["b", "a", "d"], "preferred first, then oldest");
+  assert.ok(L.recentlyChanged({ updatedAt: 1000 }, 1000 + 2 * 864e5, 3) && !L.recentlyChanged({ updatedAt: 1000 }, 1000 + 4 * 864e5, 3));
+  // IBAN checksum: random valid IBANs pass; any one mistyped character or two swapped neighbours fail
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ", D = "0123456789";
+  const make = (bank, acct) => { const n = BigInt([...(bank + acct + "PK00")].map((c) => parseInt(c, 36)).join("")); return "PK" + String(98n - (n % 97n)).padStart(2, "0") + bank + acct; };
+  seed = 4242;
+  for (let run = 0; run < 400; run++) {
+    const bank = Array.from({ length: 4 }, () => A[ri(0, 25)]).join(""), acct = Array.from({ length: 16 }, () => D[ri(0, 9)]).join("");
+    const iban = make(bank, acct);
+    assert.ok(L.ibanOk(iban), "valid IBAN " + iban);
+    assert.strictEqual(L.accountProblem({ kind: "bank", provider: "Any Bank", number: L.formatAccountNumber(iban).toLowerCase(), title: "Ali" }), "");
+    const pos = ri(2, 23), pool = pos >= 4 && pos < 8 ? A : D;
+    let c; do { c = pool[ri(0, pool.length - 1)]; } while (c === iban[pos]);
+    assert.ok(!L.ibanOk(iban.slice(0, pos) + c + iban.slice(pos + 1)), "one wrong character must fail");
+    const k = ri(8, 22);
+    if (iban[k] !== iban[k + 1]) assert.ok(!L.ibanOk(iban.slice(0, k) + iban[k + 1] + iban[k] + iban.slice(k + 2)), "swapped digits must fail");
+  }
+}
+console.log("all tests passed (incl. 3000 random flats + 1500 breakdown flats + 400 random IBANs)");
